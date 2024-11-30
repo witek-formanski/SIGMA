@@ -8,4 +8,12 @@ class Day : IDay {
     override fun getResults(): List<CompletionStatus> {
         return results.toList()
     }
+
+    override fun add(completionStatus: CompletionStatus) {
+        results.add(completionStatus)
+    }
+
+    override fun removeAt(index: Int) {
+        results.removeAt(index)
+    }
 }
