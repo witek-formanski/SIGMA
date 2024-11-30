@@ -1,4 +1,8 @@
 package sigma.dataAccess.impl.data
 
-class Resolution {
+class Resolution(
+    private val name: String,
+    private val description: String = ""
+) {
+
 }
