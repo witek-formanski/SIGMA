@@ -1,4 +1,4 @@
-package sigma.businessLogic.impl
+package sigma.businessLogic.impl.managers
 
 import sigma.dataAccess.impl.data.CompletionStatus
 import sigma.dataAccess.impl.data.Resolution
@@ -8,7 +8,7 @@ import sigma.dataAccess.model.loggers.ILogger
 class ResolutionsManager(
     private var resolutions: MutableList<Resolution>,
     private var timeline: Timeline,
-    private var timeManager: TimeManager
+    private var timeManager: TimeManager,
     private var logger: ILogger
 ) {
     fun addResolution(resolution: Resolution): Unit {
@@ -21,7 +21,7 @@ class ResolutionsManager(
             }
         }
 
-        // TODO: refactor
+        // TODO("refactor")
         for (day in timeline.getDays()) {
             day.add(CompletionStatus.UNKNOWN)
         }
@@ -37,7 +37,7 @@ class ResolutionsManager(
             return
         }
 
-        // TODO: refactor
+        // TODO("refactor")
         for (day in timeline.getDays()) {
             day.removeAt(index)
         }
@@ -57,7 +57,7 @@ class ResolutionsManager(
             return
         }
 
-        // TODO: refactor
+        // TODO("refactor")
         for (day in timeline.getDays()) {
             val status = day[from]
             day.removeAt(from)
