@@ -1,19 +1,33 @@
 package sigma.dataAccess.impl.data
 
-import sigma.dataAccess.model.data.IDay
+class Day {
+    private var results: MutableList<CompletionStatus> = mutableListOf()
 
-class Day : IDay {
-    private var results : MutableList<CompletionStatus> = mutableListOf()
-
-    override fun getResults(): List<CompletionStatus> {
+    fun getResults(): List<CompletionStatus> {
         return results.toList()
     }
 
-    override fun add(completionStatus: CompletionStatus) {
+    fun add(completionStatus: CompletionStatus) {
         results.add(completionStatus)
     }
 
-    override fun removeAt(index: Int) {
+    fun add(index: Int, completionStatus: CompletionStatus) {
+        results.add(index, completionStatus)
+    }
+
+    fun removeAt(index: Int) {
         results.removeAt(index)
+    }
+
+    fun get(index: Int): CompletionStatus {
+        return results[index]
+    }
+
+    companion object {
+        fun createEmptyDay(resolutionsCount: Int): Day {
+            val day = Day()
+            repeat(resolutionsCount) { day.add(CompletionStatus.UNKNOWN) }
+            return day
+        }
     }
 }

@@ -3,14 +3,26 @@ package sigma.businessLogic.impl.managers
 import sigma.dataAccess.impl.data.CompletionStatus
 import sigma.dataAccess.impl.data.Resolution
 import sigma.dataAccess.impl.data.Timeline
+import sigma.dataAccess.impl.managers.TimeManager
 import sigma.dataAccess.model.loggers.ILogger
+import sigma.dataAccess.model.parsers.IParser
 
+// TODO("Refactor - move some responsibility to other classes???")
 class ResolutionsManager(
     private var resolutions: MutableList<Resolution>,
     private var timeline: Timeline,
     private var timeManager: TimeManager,
-    private var logger: ILogger
+    private var logger: ILogger,
+    private var parser: IParser
 ) {
+    fun init() : Unit {
+
+    }
+
+    fun validate() : Unit {
+
+    }
+
     fun addResolution(resolution: Resolution): Unit {
         // validate
         val name = resolution.getName()

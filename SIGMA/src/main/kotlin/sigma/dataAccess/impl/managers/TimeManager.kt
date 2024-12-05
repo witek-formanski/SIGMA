@@ -1,4 +1,4 @@
-package sigma.businessLogic.impl.managers
+package sigma.dataAccess.impl.managers
 
 import java.time.LocalDate
 
@@ -6,6 +6,10 @@ class TimeManager {
     companion object {
         fun today(): LocalDate {
             return LocalDate.now()
+        }
+
+        fun yesterday() : LocalDate {
+            TODO("implement it")
         }
 
         fun parse(date: String): LocalDate {

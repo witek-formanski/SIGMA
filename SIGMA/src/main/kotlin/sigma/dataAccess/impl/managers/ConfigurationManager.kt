@@ -1,5 +1,5 @@
-package sigma.dataAccess.impl.providers
+package sigma.dataAccess.impl.managers
 
-class ConfigurationProvider {
+class ConfigurationManager {
     // TODO("Read \"appsettings.json\" and provide other classes with serialized data.")
 }
