@@ -3,7 +3,7 @@ package sigma.businessLogic.impl.managers
 import sigma.dataAccess.impl.data.CompletionStatus
 import sigma.dataAccess.impl.data.Resolution
 import sigma.dataAccess.impl.data.Timeline
-import sigma.dataAccess.impl.managers.TimeManager
+import sigma.dataAccess.impl.managers.ConfigurationManager
 import sigma.dataAccess.model.loggers.ILogger
 import sigma.dataAccess.model.parsers.IParser
 
@@ -11,12 +11,13 @@ import sigma.dataAccess.model.parsers.IParser
 class ResolutionsManager(
     private var resolutions: MutableList<Resolution>,
     private var timeline: Timeline,
-    private var timeManager: TimeManager,
     private var logger: ILogger,
-    private var parser: IParser
+    private var parser: IParser,
+    private var configurationManager: ConfigurationManager
 ) {
     fun init() : Unit {
-
+        resolutions = parser.readResolutions(configurationManager.getResolutionsPath())
+        timeline = parser.readTimeline(configurationManager.getTimelinePath())
     }
 
     fun validate() : Unit {
@@ -25,16 +26,16 @@ class ResolutionsManager(
 
     fun addResolution(resolution: Resolution): Unit {
         // validate
-        val name = resolution.getName()
+        val name = resolution.name
         for (r in resolutions) {
-            if (r.getName() == name) {
+            if (r.name == name) {
                 logger.error("Cannot add resolution \"$name\". Resolution with this name already exists.")
                 return
             }
         }
 
         // TODO("refactor")
-        for (day in timeline.getDays()) {
+        for (day in timeline.days) {
             day.add(CompletionStatus.UNKNOWN)
         }
 
@@ -43,14 +44,14 @@ class ResolutionsManager(
     }
 
     fun removeResolution(name: String): Unit {
-        val index = resolutions.indexOfFirst { it.getName() == name }
+        val index = resolutions.indexOfFirst { it.name == name }
         if (index == -1) {
             logger.error("Cannot remove resolution \"$name\". Resolution with this name does not exist.")
             return
         }
 
         // TODO("refactor")
-        for (day in timeline.getDays()) {
+        for (day in timeline.days) {
             day.removeAt(index)
         }
 
@@ -70,7 +71,7 @@ class ResolutionsManager(
         }
 
         // TODO("refactor")
-        for (day in timeline.getDays()) {
+        for (day in timeline.days) {
             val status = day[from]
             day.removeAt(from)
             day.add(to, status)

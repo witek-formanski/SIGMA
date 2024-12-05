@@ -81,25 +81,25 @@ class CsvParser(private val logger: ILogger) : IParser {
 
         for ((date, statuses) in dateResolutionStatuses) {
             while (currentDate.isBefore(date)) {
-                timeline.getDays().add(Day.createEmptyDay(resolutionsCount))
+                timeline.days.add(Day.createEmptyDay(resolutionsCount))
                 logger.debug("Added empty day for date: $currentDate")
                 currentDate = currentDate.plusDays(1)
             }
             val day = Day()
             statuses.forEach { day.add(it) }
-            timeline.getDays().add(day)
+            timeline.days.add(day)
             logger.debug("Added day for date: $date with statuses: $statuses")
             currentDate = currentDate.plusDays(1)
         }
 
         val today = TimeManager.today()
         while (currentDate.isBefore(today)) {
-            timeline.getDays().add(Day.createEmptyDay(resolutionsCount))
+            timeline.days.add(Day.createEmptyDay(resolutionsCount))
             logger.debug("Added empty day for date: $currentDate")
             currentDate = currentDate.plusDays(1)
         }
 
-        logger.debug("Finished reading timeline. Total days: ${timeline.getDays().size}")
+        logger.debug("Finished reading timeline. Total days: ${timeline.days.size}")
         return timeline
     }
 
@@ -114,12 +114,12 @@ class CsvParser(private val logger: ILogger) : IParser {
 
     override fun writeTimeline(path: String, timeline: Timeline) {
         logger.debug("Writing timeline to file: $path")
-        val lines = timeline.getDays().mapIndexed { index, day ->
-            val date = TimeManager.toString(timeline.getStartDate().plusDays(index.toLong()))
+        val lines = timeline.days.mapIndexed { index, day ->
+            val date = TimeManager.toString(timeline.startDate.plusDays(index.toLong()))
             val statuses = day.getResults().joinToString(",") { it.toString() }
             "$date,$statuses"
         }
         File(path).writeText(lines.joinToString("\n"))
-        logger.debug("Finished writing timeline. Total days: ${timeline.getDays().size}")
+        logger.debug("Finished writing timeline. Total days: ${timeline.days.size}")
     }
 }

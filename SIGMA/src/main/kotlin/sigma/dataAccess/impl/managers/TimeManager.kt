@@ -8,10 +8,6 @@ class TimeManager {
             return LocalDate.now()
         }
 
-        fun yesterday() : LocalDate {
-            TODO("implement it")
-        }
-
         fun parse(date: String): LocalDate {
             return LocalDate.parse(date)
         }

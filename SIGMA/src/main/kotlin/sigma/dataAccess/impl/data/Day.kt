@@ -19,7 +19,7 @@ class Day {
         results.removeAt(index)
     }
 
-    fun get(index: Int): CompletionStatus {
+    operator fun get(index: Int): CompletionStatus {
         return results[index]
     }
 
