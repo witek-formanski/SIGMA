@@ -20,8 +20,9 @@ class ResolutionsManager(
         timeline = parser.readTimeline(configurationManager.getTimelinePath())
     }
 
-    fun validate() : Unit {
-
+    fun close() : Unit {
+        parser.writeResolutions(configurationManager.getResolutionsPath(), resolutions)
+        parser.writeTimeline(configurationManager.getTimelinePath(), timeline)
     }
 
     fun addResolution(resolution: Resolution): Unit {
