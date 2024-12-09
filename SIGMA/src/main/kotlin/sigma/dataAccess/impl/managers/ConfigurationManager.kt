@@ -10,10 +10,10 @@ class ConfigurationManager {
     }
 
     fun getTimelinePath(): String {
-        TODO()
+        return "C:\\Program Files\\Sigma\\timeline.csv"
     }
 
     fun getResolutionsPath(): String {
-        TODO()
+        return "C:\\Program Files\\Sigma\\resolutions.csv"
     }
 }

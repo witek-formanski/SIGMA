@@ -8,4 +8,5 @@ interface IParser {
     fun readResolutions(path: String) : MutableList<Resolution>
     fun writeTimeline(path: String, timeline: Timeline) : Unit
     fun writeResolutions(path: String, resolutions: List<Resolution>) : Unit
+    fun checkFiles(resolutionsPath: String, timelinePath: String) : Boolean
 }

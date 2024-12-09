@@ -10,6 +10,10 @@ import sigma.dataAccess.model.loggers.ILogger
 import java.io.File
 
 class CsvParser(private val logger: ILogger) : IParser {
+    override fun checkFiles(resolutionsPath: String, timelinePath: String): Boolean {
+        return File(resolutionsPath).exists() && File(timelinePath).exists()
+    }
+
     override fun readResolutions(path: String): MutableList<Resolution> {
         logger.debug("Starting to read resolutions from file: $path")
         val file = File(path)
