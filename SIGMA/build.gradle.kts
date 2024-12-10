@@ -22,6 +22,13 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    val voyagerVersion = "1.1.0-beta02"
+    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
 }
 
 
