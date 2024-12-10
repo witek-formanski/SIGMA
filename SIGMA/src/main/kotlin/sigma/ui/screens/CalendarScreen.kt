@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.lerp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import sigma.businessLogic.impl.managers.ResolutionsManager
 
 fun lerp(start: Color, end: Color, fraction: Float): Color {
     val startRed = start.red
@@ -36,7 +37,7 @@ fun lerp(start: Color, end: Color, fraction: Float): Color {
     return Color(red, green, blue, alpha)
 }
 
-class CalendarScreen : Screen {
+class CalendarScreen(val manager: ResolutionsManager) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

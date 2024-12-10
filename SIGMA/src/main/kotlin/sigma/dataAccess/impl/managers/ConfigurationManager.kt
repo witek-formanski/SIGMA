@@ -5,6 +5,7 @@ import sigma.dataAccess.impl.data.Configuration
 import java.io.File
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.Json.Default.decodeFromString
 import sigma.dataAccess.impl.data.Resolution
 
 class ConfigurationManager {
@@ -21,7 +22,12 @@ class ConfigurationManager {
         }
 
         val json = file.readText()
-        return Json.decodeFromString(json)
+        return try {
+            Json.decodeFromString<Configuration>(json)
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+            throw IllegalArgumentException("Failed to parse configuration: ${e.message}", e)
+        }
     }
 
     fun getConfiguration(): Configuration {

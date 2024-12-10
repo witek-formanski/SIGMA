@@ -40,7 +40,7 @@ class StartScreen : Screen {
                 val timelinePath = configuration!!.getTimelinePath()
                 val timeline = parser.readTimeline(timelinePath)
                 manager = ResolutionsManager(resolutions.toMutableList(), timeline, logger, parser, configuration!!)
-                navigator.push(HomeScreen())
+                navigator.push(HomeScreen(manager!!))
             } catch (e: Exception) {
                 navigator.push(InitialScreen(manager, logger, parser, configuration))
             }

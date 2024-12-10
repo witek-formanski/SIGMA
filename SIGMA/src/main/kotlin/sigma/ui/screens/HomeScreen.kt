@@ -10,14 +10,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import sigma.businessLogic.impl.managers.ResolutionsManager
 
-class HomeScreen : Screen {
+class HomeScreen(val manager: ResolutionsManager) : Screen {
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             Text("Welcome Back!", fontSize = 24.sp)
             Spacer(modifier = Modifier.height(16.dp))
-            HomePanel("Calendar") { /* Navigate to Calendar */ }
+            HomePanel("Calendar") { navigator.push(CalendarScreen(manager)) }
             HomePanel("Today") { /* Navigate to Today View */ }
             HomePanel("Statistics") { /* Navigate to Statistics View */ }
         }

@@ -11,8 +11,7 @@ data class Configuration(
 
 @Serializable
 data class File(
-    val path: String,
-    val filename: String
+    val path: String
 )
 
 @Serializable
