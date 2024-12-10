@@ -12,11 +12,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
-import sigma.dataAccess.impl.data.Timeline
 import sigma.dataAccess.impl.loggers.ConsoleLogger
 import sigma.dataAccess.impl.managers.ConfigurationManager
 import sigma.dataAccess.impl.parsers.CsvParser
-import java.time.LocalDate
 
 class StartScreen : Screen {
     @Composable
@@ -44,17 +42,7 @@ class StartScreen : Screen {
                 manager = ResolutionsManager(resolutions.toMutableList(), timeline, logger, parser, configuration!!)
                 navigator.push(HomeScreen())
             } catch (e: Exception) {
-                navigator.push(InitialScreen(onStartNewChallenge = {
-                    manager = ResolutionsManager(
-                        mutableListOf(),
-                        Timeline(LocalDate.now(), mutableListOf()),
-                        logger,
-                        parser,
-                        configuration!!
-                    )
-                }, onImportData = {
-                    //TODO("import files")
-                }))
+                navigator.push(InitialScreen(manager, logger, parser, configuration))
             }
         }
     }
