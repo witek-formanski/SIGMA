@@ -2,18 +2,48 @@ package sigma.dataAccess.impl.managers
 
 import sigma.dataAccess.impl.data.Configuration
 
+import java.io.File
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import sigma.dataAccess.impl.data.Resolution
+
 class ConfigurationManager {
-    private var configuration: Configuration? = null
+    private var configuration: Configuration
+
+    init {
+        configuration = parseConfiguration("C:\\Program Files\\Sigma\\appsettings.json")
+    }
+
+    private fun parseConfiguration(filePath: String): Configuration {
+        val file = File(filePath)
+        if (!file.exists()) {
+            throw IllegalArgumentException("Configuration file not found: $filePath")
+        }
+
+        val json = file.readText()
+        return Json.decodeFromString(json)
+    }
 
     fun getConfiguration(): Configuration {
         TODO()
     }
 
     fun getTimelinePath(): String {
-        return "C:\\Program Files\\Sigma\\timeline.csv"
+        return configuration.timeline.file.path
     }
 
     fun getResolutionsPath(): String {
-        return "C:\\Program Files\\Sigma\\resolutions.csv"
+        return configuration.resolutions.file.path
     }
+
+    fun getResolutionsList(): List<Resolution> {
+        return configuration.resolutions.list.map { resolutionItem ->
+            Resolution(
+                name = resolutionItem.name,
+                description = resolutionItem.description,
+                image = resolutionItem.image
+            )
+        }
+    }
+
 }

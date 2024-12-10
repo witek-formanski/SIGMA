@@ -1,4 +1,4 @@
-package sigma.ui.views
+package sigma.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun StartupScreen(onStartNewChallenge: () -> Unit, onImportData: () -> Unit) {
+fun InitialScreen(onStartNewChallenge: () -> Unit, onImportData: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

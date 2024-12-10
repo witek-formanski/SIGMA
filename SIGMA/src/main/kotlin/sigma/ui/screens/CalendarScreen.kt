@@ -1,4 +1,4 @@
-package sigma.ui.views
+package sigma.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
