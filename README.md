@@ -16,7 +16,8 @@ SIGMA will be a transformative app designed to support users in achieving their 
 - daily streaks
 
 ## Plan
-First part: backend. Second part: frontend.
+First part: basic functionality (parsing data, a few screens, most of backend). Second part: extended functionality (statistics, notifications, pretty frontend, fully implemented backend).
 
 ## Libraries
-- not decided yet, but Kotlin Multiplatform is a likely choice.
+- Compose
+- Voyager
