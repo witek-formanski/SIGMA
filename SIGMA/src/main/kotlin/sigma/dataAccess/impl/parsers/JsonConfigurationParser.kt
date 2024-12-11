@@ -2,10 +2,14 @@ package sigma.dataAccess.impl.parsers
 
 import kotlinx.serialization.json.Json
 import sigma.dataAccess.impl.data.Configuration
+import sigma.dataAccess.model.loggers.ILogger
 import sigma.dataAccess.model.parsers.IConfigurationParser
 import java.io.File
 
-class JsonConfigurationParser : IConfigurationParser {
+// TODO("log")
+class JsonConfigurationParser(
+    private var logger: ILogger
+) : IConfigurationParser {
     override fun read(path: String): Configuration {
         val file = File(path)
         if (!file.exists()) {

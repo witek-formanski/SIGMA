@@ -18,25 +18,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
 
-fun lerp(start: Color, end: Color, fraction: Float): Color {
-    val startRed = start.red
-    val startGreen = start.green
-    val startBlue = start.blue
-    val startAlpha = start.alpha
-
-    val endRed = end.red
-    val endGreen = end.green
-    val endBlue = end.blue
-    val endAlpha = end.alpha
-
-    val red = startRed + (endRed - startRed) * fraction
-    val green = startGreen + (endGreen - startGreen) * fraction
-    val blue = startBlue + (endBlue - startBlue) * fraction
-    val alpha = startAlpha + (endAlpha - startAlpha) * fraction
-
-    return Color(red, green, blue, alpha)
-}
-
 class CalendarScreen(val manager: ResolutionsManager) : Screen {
     @Composable
     override fun Content() {
@@ -60,9 +41,10 @@ class CalendarScreen(val manager: ResolutionsManager) : Screen {
                         val dayOfMonth = (week - 1) * 7 + day
                         if (dayOfMonth <= daysInMonth) {
                             val color = when (val result = StatisticsManager.getResult(dayOfMonth)) { // Placeholder
-                                in 0.0..1.0 -> lerp(Color.Red, Color.Green, result.toFloat())
-                                -1.0 -> Color.Gray
-                                else -> Color.White
+                                in 0.0..1.0 -> lerp(Color.Red, Color.Green, result)
+                                -1f -> Color.Gray
+                                -2f -> Color.White
+                                else -> throw IllegalArgumentException("Result for day color not in {-2, -1, 0..1}.")
                             }
                             Box(
                                 modifier = Modifier
@@ -78,5 +60,24 @@ class CalendarScreen(val manager: ResolutionsManager) : Screen {
             }
         }
     }
+}
+
+fun lerp(start: Color, end: Color, fraction: Float): Color {
+    val startRed = start.red
+    val startGreen = start.green
+    val startBlue = start.blue
+    val startAlpha = start.alpha
+
+    val endRed = end.red
+    val endGreen = end.green
+    val endBlue = end.blue
+    val endAlpha = end.alpha
+
+    val red = startRed + (endRed - startRed) * fraction
+    val green = startGreen + (endGreen - startGreen) * fraction
+    val blue = startBlue + (endBlue - startBlue) * fraction
+    val alpha = startAlpha + (endAlpha - startAlpha) * fraction
+
+    return Color(red, green, blue, alpha)
 }
 

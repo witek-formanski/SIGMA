@@ -14,7 +14,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
 
-class HomeScreen(val manager: ResolutionsManager) : Screen {
+class HomeScreen(private val manager: ResolutionsManager) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

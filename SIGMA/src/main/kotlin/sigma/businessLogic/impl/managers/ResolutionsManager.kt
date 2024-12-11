@@ -11,30 +11,30 @@ import sigma.dataAccess.model.parsers.ITimelineParser
 // TODO("Refactor - move some responsibility to other classes???")
 class ResolutionsManager(
     private val logger: ILogger,
-    private val timelineParser: ITimelineParser,
-    private val configurationParser: IConfigurationParser
+    private val configurationParser: IConfigurationParser,
+    private val timelineParser: ITimelineParser
 ) {
+    private var configurationWritePath : String = "C:\\Program Files\\Sigma\\appsettings.json"
+    private var configurationReadPath : String = configurationWritePath
     private var configuration: Configuration = Configuration.getDefault()
     private var timeline: Timeline = Timeline.getDefault()
-    private var configurationPath : String = "C:\\Program Files\\Sigma\\appsettings.json"
 
-    fun tryInit() : Boolean {
-        try {
-            configuration = configurationParser.read(configurationPath)
+    fun tryInit() : Unit {
+            configuration = configurationParser.read(configurationReadPath)
             logger.debug("Successfully parsed configuration.")
             timeline = timelineParser.read(configuration.timelinePath, configuration.resolutions.size)
             logger.debug("Successfully parsed timeline.")
-            return true
-        } catch (e: Exception) {
-            logger.debug("Cannot initialize ResolutionsManager: ${e.message}")
-            return false
-        }
     }
 
     fun close() : Unit {
-        configurationParser.write(configurationPath, configuration)
+        configurationParser.write(configurationWritePath, configuration)
         timelineParser.write(configuration.timelinePath, timeline)
     }
+
+    fun setConfigurationReadPath(path: String) {
+        configurationReadPath = path
+    }
+
 
     fun addResolution(resolution: Resolution): Unit {
         // validate

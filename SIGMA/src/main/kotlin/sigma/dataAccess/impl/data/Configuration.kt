@@ -30,8 +30,8 @@ data class CompletionStatusWeights(
 
 @Serializable
 data class DayColors(
-    val completed: String,
-    val uncompleted: String,
-    val unknown: String,
+    val success: String,
+    val failure: String,
+    val empty: String,
     val future: String
 )
