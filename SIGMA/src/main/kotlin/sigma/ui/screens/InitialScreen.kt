@@ -12,13 +12,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
-import sigma.dataAccess.impl.data.Timeline
-import sigma.dataAccess.model.loggers.ILogger
-import sigma.dataAccess.model.parsers.ITimelineParser
 import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
-import java.time.LocalDate
 
 class InitialScreen(
     private val manager: ResolutionsManager
@@ -45,7 +41,7 @@ class InitialScreen(
 
             Button(onClick = {
                 try {
-                    val selectedFile = selectCsvFile()
+                    val selectedFile = selectConfigurationFile()
                     if (selectedFile != null) {
                         manager.setConfigurationReadPath(selectedFile.path)
                         manager.tryInit()
@@ -67,8 +63,8 @@ class InitialScreen(
         }
     }
 
-    private fun selectCsvFile(): File? {
-        val fileDialog = FileDialog(Frame(), "Select CSV File", FileDialog.LOAD).apply {
+    private fun selectConfigurationFile(): File? {
+        val fileDialog = FileDialog(Frame(), "Select configuration in JSON", FileDialog.LOAD).apply {
             isVisible = true
         }
 
