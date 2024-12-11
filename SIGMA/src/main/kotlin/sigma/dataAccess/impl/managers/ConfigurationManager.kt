@@ -52,4 +52,10 @@ class ConfigurationManager {
         }
     }
 
+    companion object {
+        fun empty(): ConfigurationManager {
+
+        }
+    }
+
 }

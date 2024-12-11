@@ -14,7 +14,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
 import sigma.dataAccess.impl.loggers.ConsoleLogger
 import sigma.dataAccess.impl.managers.ConfigurationManager
-import sigma.dataAccess.impl.parsers.CsvParser
+import sigma.dataAccess.impl.parsers.CsvTimelineParser
 
 class StartScreen : Screen {
     @Composable
@@ -27,22 +27,19 @@ class StartScreen : Screen {
         }
 
         val navigator = LocalNavigator.currentOrThrow
-
-        var configuration: ConfigurationManager? = null
-        var manager: ResolutionsManager? = null
-        val logger = ConsoleLogger()
-        val parser = CsvParser(logger)
+        val logger = ConsoleLogger() // TODO("use DI")
+        val parser = CsvTimelineParser(logger) // TODO("use DI")
 
         LaunchedEffect(Unit) {
             try {
-                configuration = ConfigurationManager()
-                val resolutions = configuration!!.getResolutionsList()
-                val timelinePath = configuration!!.getTimelinePath()
-                val timeline = parser.readTimeline(timelinePath)
-                manager = ResolutionsManager(resolutions.toMutableList(), timeline, logger, parser, configuration!!)
-                navigator.push(HomeScreen(manager!!))
+                val configuration = ConfigurationManager()
+                val resolutions = configuration.getResolutionsList()
+                val timelinePath = configuration.getTimelinePath()
+                val timeline = parser.read(timelinePath, resolutions.size)
+                val manager = ResolutionsManager(resolutions.toMutableList(), timeline, logger, parser, configuration)
+                navigator.push(HomeScreen(manager))
             } catch (e: Exception) {
-                navigator.push(InitialScreen(manager, logger, parser, configuration))
+                navigator.push(InitialScreen(logger, parser))
             }
         }
     }

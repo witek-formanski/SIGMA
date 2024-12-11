@@ -4,43 +4,34 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Configuration(
-    val resolutions: Resolutions,
-    val timeline: TimelineItem,
-    val completionStatus: CompletionStatusItem?
-)
+    var resolutions: MutableList<Resolution>,
+    val timelinePath: String,
+    val completionStatusWeights: CompletionStatusWeights? = null,
+    val dayColors: DayColors? = null
+) {
+    companion object {
+        fun getDefault(): Configuration {
+            return Configuration(mutableListOf(), "C:\\Program Files\\Sigma\\timeline.csv")
+        }
+    }
+
+    fun update(resolutions: MutableList<Resolution>) {
+        this.resolutions = resolutions
+    }
+}
 
 @Serializable
-data class File(
-    val path: String
-)
-
-@Serializable
-data class Resolutions(
-    val file: File,
-    val list: List<ResolutionItem>
-)
-
-@Serializable
-data class ResolutionItem(
-    val name: String,
-    val description: String,
-    val image: String
-)
-
-@Serializable
-data class TimelineItem(
-    val file: File
-)
-
-@Serializable
-data class CompletionStatusItem(
-    val weights: Weights
-)
-
-@Serializable
-data class Weights(
+data class CompletionStatusWeights(
     val completed: Double,
     val partial: Double,
     val uncompleted: Double,
     val unknown: Double
+)
+
+@Serializable
+data class DayColors(
+    val completed: String,
+    val uncompleted: String,
+    val unknown: String,
+    val future: String
 )

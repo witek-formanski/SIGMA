@@ -24,7 +24,7 @@ class Day {
     }
 
     companion object {
-        fun createEmptyDay(resolutionsCount: Int): Day {
+        fun getEmpty(resolutionsCount: Int): Day {
             val day = Day()
             repeat(resolutionsCount) { day.add(CompletionStatus.UNKNOWN) }
             return day

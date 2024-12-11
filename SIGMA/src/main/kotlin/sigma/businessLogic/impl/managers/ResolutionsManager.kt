@@ -1,34 +1,45 @@
 package sigma.businessLogic.impl.managers
 
 import sigma.dataAccess.impl.data.CompletionStatus
+import sigma.dataAccess.impl.data.Configuration
 import sigma.dataAccess.impl.data.Resolution
 import sigma.dataAccess.impl.data.Timeline
-import sigma.dataAccess.impl.managers.ConfigurationManager
 import sigma.dataAccess.model.loggers.ILogger
-import sigma.dataAccess.model.parsers.IParser
+import sigma.dataAccess.model.parsers.IConfigurationParser
+import sigma.dataAccess.model.parsers.ITimelineParser
 
 // TODO("Refactor - move some responsibility to other classes???")
 class ResolutionsManager(
-    private var resolutions: MutableList<Resolution>,
-    private var timeline: Timeline,
-    private var logger: ILogger,
-    private var parser: IParser,
-    private var configurationManager: ConfigurationManager
+    private val logger: ILogger,
+    private val timelineParser: ITimelineParser,
+    private val configurationParser: IConfigurationParser
 ) {
-    fun init() : Unit {
-        resolutions = parser.readResolutions(configurationManager.getResolutionsPath())
-        timeline = parser.readTimeline(configurationManager.getTimelinePath())
+    private var configuration: Configuration = Configuration.getDefault()
+    private var timeline: Timeline = Timeline.getDefault()
+    private var configurationPath : String = "C:\\Program Files\\Sigma\\appsettings.json"
+
+    fun tryInit() : Boolean {
+        try {
+            configuration = configurationParser.read(configurationPath)
+            logger.debug("Successfully parsed configuration.")
+            timeline = timelineParser.read(configuration.timelinePath, configuration.resolutions.size)
+            logger.debug("Successfully parsed timeline.")
+            return true
+        } catch (e: Exception) {
+            logger.debug("Cannot initialize ResolutionsManager: ${e.message}")
+            return false
+        }
     }
 
     fun close() : Unit {
-        parser.writeResolutions(configurationManager.getResolutionsPath(), resolutions)
-        parser.writeTimeline(configurationManager.getTimelinePath(), timeline)
+        configurationParser.write(configurationPath, configuration)
+        timelineParser.write(configuration.timelinePath, timeline)
     }
 
     fun addResolution(resolution: Resolution): Unit {
         // validate
         val name = resolution.name
-        for (r in resolutions) {
+        for (r in configuration.resolutions) {
             if (r.name == name) {
                 logger.error("Cannot add resolution \"$name\". Resolution with this name already exists.")
                 return
@@ -40,12 +51,12 @@ class ResolutionsManager(
             day.add(CompletionStatus.UNKNOWN)
         }
 
-        resolutions.add(resolution)
+        configuration.resolutions.add(resolution)
         logger.debug("Resolution \"$name\" added successfully.")
     }
 
     fun removeResolution(name: String): Unit {
-        val index = resolutions.indexOfFirst { it.name == name }
+        val index = configuration.resolutions.indexOfFirst { it.name == name }
         if (index == -1) {
             logger.error("Cannot remove resolution \"$name\". Resolution with this name does not exist.")
             return
@@ -56,7 +67,7 @@ class ResolutionsManager(
             day.removeAt(index)
         }
 
-        resolutions.removeAt(index)
+        configuration.resolutions.removeAt(index)
         logger.debug("Resolution \"$name\" removed successfully.")
     }
 
@@ -65,7 +76,7 @@ class ResolutionsManager(
     }
 
     fun moveResolution(from: Int, to: Int): Unit {
-        if (from > resolutions.size || to > resolutions.size || from < 0 || to < 0 || from == to) {
+        if (from > configuration.resolutions.size || to > configuration.resolutions.size || from < 0 || to < 0 || from == to) {
             logger.error("Cannot move resolution to specified position.")
             logger.debug("Invalid indices: from = $from, to = $to.")
             return
@@ -78,9 +89,9 @@ class ResolutionsManager(
             day.add(to, status)
         }
 
-        val resolution = resolutions[from]
-        resolutions.removeAt(from)
-        resolutions.add(to, resolution)
+        val resolution = configuration.resolutions[from]
+        configuration.resolutions.removeAt(from)
+        configuration.resolutions.add(to, resolution)
         logger.debug("Resolution moved successfully from position $from to $to.")
     }
 }

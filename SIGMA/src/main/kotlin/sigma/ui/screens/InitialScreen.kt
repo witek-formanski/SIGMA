@@ -9,24 +9,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
 import sigma.dataAccess.impl.data.Timeline
 import sigma.dataAccess.impl.managers.ConfigurationManager
 import sigma.dataAccess.model.loggers.ILogger
-import sigma.dataAccess.model.parsers.IParser
+import sigma.dataAccess.model.parsers.ITimelineParser
 import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
 import java.time.LocalDate
 
 class InitialScreen(
-    var manager: ResolutionsManager?,
     val logger: ILogger,
-    val parser: IParser,
-    var configuration: ConfigurationManager?
+    val parser: ITimelineParser,
 ) : Screen {
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         var importStatus by remember { mutableStateOf("") }
 
         Column(
@@ -38,12 +39,14 @@ class InitialScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(onClick = {
-                manager = ResolutionsManager(
+                val configuration : ConfigurationManager = TODO()
+
+                val manager = ResolutionsManager(
                     mutableListOf(),
                     Timeline(LocalDate.now(), mutableListOf()),
                     logger,
                     parser,
-                    configuration!!
+                    configuration
                 )
             }) {
                 Text("Start New Challenge")
@@ -54,8 +57,10 @@ class InitialScreen(
                 try {
                     val selectedFile = selectCsvFile()
                     if (selectedFile != null) {
-                        parser.readTimeline(selectedFile.path)
+                        var timeline = parser.read(selectedFile.path)
+
                         importStatus = "Successfully imported: ${selectedFile.name}"
+                        navigator.replace(HomeScreen(manager!!))
                     } else {
                         importStatus = "No file selected"
                     }
