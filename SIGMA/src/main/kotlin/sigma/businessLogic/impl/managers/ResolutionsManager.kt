@@ -14,7 +14,7 @@ class ResolutionsManager(
     private val configurationParser: IConfigurationParser,
     private val timelineParser: ITimelineParser
 ) {
-    private var configurationWritePath : String = "C:\\Program Files\\Sigma\\appsettings.json"
+    private var configurationWritePath : String = "appsettings.json"
     private var configurationReadPath : String = configurationWritePath
     private var configuration: Configuration = Configuration.getDefault()
     private var timeline: Timeline = Timeline.getDefault()
@@ -34,7 +34,6 @@ class ResolutionsManager(
     fun setConfigurationReadPath(path: String) {
         configurationReadPath = path
     }
-
 
     fun addResolution(resolution: Resolution): Unit {
         // validate

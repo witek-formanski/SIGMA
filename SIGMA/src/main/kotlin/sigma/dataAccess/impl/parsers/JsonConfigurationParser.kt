@@ -1,5 +1,6 @@
 package sigma.dataAccess.impl.parsers
 
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import sigma.dataAccess.impl.data.Configuration
 import sigma.dataAccess.model.loggers.ILogger
@@ -26,6 +27,6 @@ class JsonConfigurationParser(
     }
 
     override fun write(path: String, configuration: Configuration) {
-        TODO("Not yet implemented")
+        File(path).writeText(Json.encodeToString(configuration))
     }
 }

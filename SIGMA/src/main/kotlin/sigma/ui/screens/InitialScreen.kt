@@ -46,7 +46,7 @@ class InitialScreen(
                         manager.setConfigurationReadPath(selectedFile.path)
                         manager.tryInit()
                         importStatus = "Successfully imported: ${selectedFile.name}"
-                        navigator.replace(HomeScreen(manager!!))
+                        navigator.replace(HomeScreen(manager))
                     } else {
                         importStatus = "No file selected"
                     }

@@ -19,7 +19,7 @@ import sigma.dataAccess.model.loggers.ILogger
 import sigma.dataAccess.model.parsers.IConfigurationParser
 import sigma.dataAccess.model.parsers.ITimelineParser
 
-class StartScreen : Screen {
+class StartScreen(private val manager: ResolutionsManager) : Screen {
     @Composable
     override fun Content() {
         Box(
@@ -30,10 +30,6 @@ class StartScreen : Screen {
         }
 
         val navigator = LocalNavigator.currentOrThrow
-        val logger: ILogger = ConsoleLogger() // TODO("use DI")
-        val timelineParser: ITimelineParser = CsvTimelineParser(logger) // TODO("use DI")
-        val configurationParser: IConfigurationParser = JsonConfigurationParser(logger)
-        val manager = ResolutionsManager(logger, configurationParser, timelineParser)
 
         LaunchedEffect(Unit) {
             try {
