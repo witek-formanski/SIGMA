@@ -3,6 +3,7 @@ package sigma.dataAccess.impl.parsers
 import sigma.dataAccess.impl.data.Timeline
 import sigma.dataAccess.impl.data.CompletionStatus
 import sigma.dataAccess.impl.data.Day
+import sigma.dataAccess.impl.data.DayState
 import sigma.dataAccess.model.parsers.ITimelineParser
 import sigma.dataAccess.model.loggers.ILogger
 import java.io.File
@@ -49,7 +50,7 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
                 logger.debug("Added empty day for date: $currentDate")
                 currentDate = currentDate.plusDays(1)
             }
-            val day = Day()
+            val day = Day(DayState.RECORDED)
             statuses.forEach { day.add(it) }
             timeline.days.add(day)
             logger.debug("Added day for date: $date with statuses: $statuses")

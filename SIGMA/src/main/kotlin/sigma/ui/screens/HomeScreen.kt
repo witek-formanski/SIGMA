@@ -13,6 +13,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
+import java.time.LocalDate
 
 class HomeScreen(private val manager: ResolutionsManager) : Screen {
     @Composable
@@ -23,8 +24,9 @@ class HomeScreen(private val manager: ResolutionsManager) : Screen {
             Text("Welcome Back!", fontSize = 24.sp)
             Spacer(modifier = Modifier.height(16.dp))
             HomePanel("Calendar") { navigator.push(CalendarScreen(manager)) }
-            HomePanel("Today") { /* Navigate to Today View */ }
-            HomePanel("Statistics") { /* Navigate to Statistics View */ }
+            HomePanel("Today") { navigator.push(DayScreen(manager, LocalDate.now())) }
+            HomePanel("Statistics") { /* TODO */ }
+            HomePanel("Settings") { navigator.push(SettingsScreen(manager)) }
         }
     }
 

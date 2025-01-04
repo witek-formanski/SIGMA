@@ -1,7 +1,11 @@
 package sigma.dataAccess.impl.data
 
-class Day {
+class Day(private val state: DayState) {
     private var statuses: MutableList<CompletionStatus> = mutableListOf()
+
+    fun getState(): DayState {
+        return state
+    }
 
     fun getResults(): List<CompletionStatus> {
         return statuses.toList()
@@ -25,7 +29,7 @@ class Day {
 
     companion object {
         fun getEmpty(resolutionsCount: Int): Day {
-            val day = Day()
+            val day = Day(DayState.EMPTY)
             repeat(resolutionsCount) { day.add(CompletionStatus.UNKNOWN) }
             return day
         }

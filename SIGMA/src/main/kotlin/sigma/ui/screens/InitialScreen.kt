@@ -16,9 +16,7 @@ import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
 
-class InitialScreen(
-    private val manager: ResolutionsManager
-) : Screen {
+class InitialScreen(private val manager: ResolutionsManager) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
