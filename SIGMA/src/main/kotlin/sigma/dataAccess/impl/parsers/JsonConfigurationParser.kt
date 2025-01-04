@@ -19,7 +19,7 @@ class JsonConfigurationParser(
         }
 
         val json = file.readText()
-        return try {
+        val configuration = try {
             Json.decodeFromString<Configuration>(json)
         } catch (e: Exception) {
             val message = "Failed to parse configuration: ${e.message}."
@@ -27,10 +27,17 @@ class JsonConfigurationParser(
             throw IllegalArgumentException(message, e)
         }
         logger.debug("Configuration read from file: $path.")
+        return configuration
     }
 
-    override fun write(path: String, configuration: Configuration) {
-        File(path).writeText(Json.encodeToString(configuration))
+    override fun write(path: String, configuration: Configuration): Unit {
+        try {
+            File(path).writeText(Json.encodeToString(configuration))
+        } catch (e: Exception) {
+            val message = "Failed to save configuration to file: $path."
+            logger.error(message)
+            throw IllegalArgumentException(message, e)
+        }
         logger.debug("Configuration saved to file: $path.")
     }
 }
