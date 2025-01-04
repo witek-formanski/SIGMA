@@ -60,7 +60,7 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
             currentDate = currentDate.plusDays(1)
         }
 
-        logger.debug("Finished reading timeline. Total days: ${timeline.days.size}")
+        logger.debug("Finished reading timeline from $path. Total days: ${timeline.days.size}")
         return timeline
     }
 
@@ -72,6 +72,6 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
             "$date,$statuses"
         }
         File(path).writeText(lines.joinToString("\n"))
-        logger.debug("Finished writing timeline. Total days: ${timeline.days.size}")
+        logger.debug("Finished writing timeline tp $path. Total days: ${timeline.days.size}")
     }
 }

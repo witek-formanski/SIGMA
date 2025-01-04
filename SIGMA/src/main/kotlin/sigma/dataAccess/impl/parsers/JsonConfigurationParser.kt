@@ -7,7 +7,6 @@ import sigma.dataAccess.model.loggers.ILogger
 import sigma.dataAccess.model.parsers.IConfigurationParser
 import java.io.File
 
-// TODO("log")
 class JsonConfigurationParser(
     private var logger: ILogger
 ) : IConfigurationParser {
@@ -21,12 +20,13 @@ class JsonConfigurationParser(
         return try {
             Json.decodeFromString<Configuration>(json)
         } catch (e: Exception) {
-            println("Error: ${e.message}")
             throw IllegalArgumentException("Failed to parse configuration: ${e.message}", e)
         }
+        logger.debug("Configuration read from file: $path.")
     }
 
     override fun write(path: String, configuration: Configuration) {
         File(path).writeText(Json.encodeToString(configuration))
+        logger.debug("Configuration saved to file: $path.")
     }
 }
