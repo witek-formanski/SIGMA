@@ -13,14 +13,16 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
         logger.debug("Starting to read timeline from file: $path")
         val file = File(path)
         if (!file.exists()) {
-            logger.error("Timeline file not found: $path")
-            throw IllegalArgumentException("Timeline file not found: $path")
+            val message = "Timeline file not found: $path."
+            logger.error(message)
+            throw IllegalArgumentException(message)
         }
 
         val lines = file.readLines()
         if (lines.isEmpty()) {
-            logger.error("Timeline file is empty: $path")
-            throw IllegalArgumentException("Timeline file is empty.")
+            val message = "Timeline file is empty: $path."
+            logger.error(message)
+            throw IllegalArgumentException(message)
         }
 
         val dateResolutionStatuses = lines.map { line ->
@@ -32,8 +34,9 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
         }
 
         if (dateResolutionStatuses.any { it.second.size != resolutionsCount }) {
-            logger.error("All days must have the same number of statuses as the first day.")
-            throw IllegalArgumentException("All days must have the same number of statuses as the first day.")
+            val message = "All days must have the same number of statuses as the first day."
+            logger.error(message)
+            throw IllegalArgumentException(message)
         }
 
         val startDate = dateResolutionStatuses.first().first

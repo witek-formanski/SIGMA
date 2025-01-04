@@ -13,14 +13,18 @@ class JsonConfigurationParser(
     override fun read(path: String): Configuration {
         val file = File(path)
         if (!file.exists()) {
-            throw IllegalArgumentException("Configuration file not found: $path")
+            val message = "Configuration file not found: $path."
+            logger.error(message)
+            throw IllegalArgumentException(message)
         }
 
         val json = file.readText()
         return try {
             Json.decodeFromString<Configuration>(json)
         } catch (e: Exception) {
-            throw IllegalArgumentException("Failed to parse configuration: ${e.message}", e)
+            val message = "Failed to parse configuration: ${e.message}."
+            logger.error(message)
+            throw IllegalArgumentException(message, e)
         }
         logger.debug("Configuration read from file: $path.")
     }
