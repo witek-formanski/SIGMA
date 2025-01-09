@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +36,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
 import java.util.Locale
-
 
 class CalendarScreen(private val manager: ResolutionsManager) : Screen {
     private val DATE_CELL_HEIGHT = 100.dp
@@ -85,6 +85,36 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                             .padding(16.dp),
                         onBackClick = onBackClick
                     )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (selectedYear.value > minYear || selectedMonth.value > Calendar.JANUARY) {
+                            IconButton(onClick = {
+                                if (selectedMonth.value == Calendar.JANUARY) {
+                                    selectedMonth.value = Calendar.DECEMBER
+                                    selectedYear.value -= 1
+                                } else {
+                                    selectedMonth.value -= 1
+                                }
+                            }) {
+                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Month")
+                            }
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (selectedYear.value < maxYear || selectedMonth.value < Calendar.DECEMBER) {
+                            IconButton(onClick = {
+                                if (selectedMonth.value == Calendar.DECEMBER) {
+                                    selectedMonth.value = Calendar.JANUARY
+                                    selectedYear.value += 1
+                                } else {
+                                    selectedMonth.value += 1
+                                }
+                            }) {
+                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Month")
+                            }
+                        }
+                    }
                     Column(
                         modifier = Modifier.padding(8.dp)
                     ) {
@@ -337,7 +367,8 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                     if (selected) {
                         MaterialTheme.colors.primary
                     } else {
-                        manager.getDayColor(LocalDate.of(year, month + 1, day)) // +1 because month is 0-based
+                        MaterialTheme.colors.onPrimary
+//                        manager.getDayColor(LocalDate.of(year, month + 1, day)) // +1 because month is 0-based
                     }
                 )
                 .clickable { onDaySelected(day) },
