@@ -50,8 +50,9 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
                 logger.debug("Added empty day for date: $currentDate")
                 currentDate = currentDate.plusDays(1)
             }
-            val day = Day(DayState.RECORDED)
+            val day = Day()
             statuses.forEach { day.add(it) }
+            day.updateState()
             timeline.days.add(day)
             logger.debug("Added day for date: $date with statuses: $statuses")
             currentDate = currentDate.plusDays(1)
@@ -70,10 +71,14 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
 
     override fun write(path: String, timeline: Timeline) {
         logger.debug("Writing timeline to file: $path")
-        val lines = timeline.days.mapIndexed { index, day ->
-            val date = timeline.startDate.plusDays(index.toLong()).toString()
-            val statuses = day.getResults().joinToString(",") { it.toString() }
-            "$date,$statuses"
+        val lines = timeline.days.mapIndexedNotNull { index, day ->
+            if (day.getState() != DayState.EMPTY) {
+                val date = timeline.startDate.plusDays(index.toLong()).toString()
+                val statuses = day.getResults().joinToString(",") { it.toString() }
+                "$date,$statuses"
+            } else {
+                null
+            }
         }
         File(path).writeText(lines.joinToString("\n"))
         logger.debug("Finished writing timeline tp $path. Total days: ${timeline.days.size}")

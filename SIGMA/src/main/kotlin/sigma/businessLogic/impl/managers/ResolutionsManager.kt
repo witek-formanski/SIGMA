@@ -44,7 +44,7 @@ class ResolutionsManager(
         val name = resolution.name
         for (r in configuration.resolutions) {
             if (r.name == name) {
-                logger.error("Cannot add resolution \"$name\". Resolution with this name already exists.")
+                logger.warn("Cannot add resolution \"$name\". Resolution with this name already exists.")
                 return
             }
         }
@@ -68,6 +68,7 @@ class ResolutionsManager(
         // TODO("refactor")
         for (day in timeline.days) {
             day.removeAt(index)
+            day.updateState()
         }
 
         configuration.resolutions.removeAt(index)
