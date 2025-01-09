@@ -35,6 +35,10 @@ class ResolutionsManager(
         configurationReadPath = path
     }
 
+    fun getResolutions(): List<Resolution> {
+        return configuration.resolutions
+    }
+
     fun addResolution(resolution: Resolution): Unit {
         // validate
         val name = resolution.name
