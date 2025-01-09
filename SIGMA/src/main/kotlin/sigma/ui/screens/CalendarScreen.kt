@@ -12,16 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +47,9 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
         Calendar(
             onDateSelected = {
                 navigator.push(DayScreen(manager, LocalDate.ofInstant(it.toInstant(), ZoneId.systemDefault())))
+            },
+            onBackClick = {
+                navigator.pop()
             }
         )
     }
@@ -62,6 +58,7 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
     @Composable
     fun Calendar(
         onDateSelected: (Date) -> Unit,
+        onBackClick: () -> Unit,
         modifier: Modifier = Modifier,
         initDate: Date = Date(),
         minYear: Int = manager.getStartDate().year,
@@ -85,7 +82,8 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                         modifier = Modifier
                             .background(MaterialTheme.colors.primary)
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(16.dp),
+                        onBackClick = onBackClick
                     )
                     Column(
                         modifier = Modifier.padding(8.dp)
@@ -215,11 +213,22 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
         year: Int,
         month: Int,
         day: Int,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        onBackClick: () -> Unit
     ) {
         Box(
             modifier = modifier
         ) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colors.onPrimary
+                )
+            }
             Text(
                 text = SimpleDateFormat("EEEE, dd MMMM yyyy").format(
                     GregorianCalendar(
@@ -229,7 +238,8 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                     ).time
                 ),
                 color = MaterialTheme.colors.onPrimary,
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.align(Alignment.Center)
             )
         }
     }
