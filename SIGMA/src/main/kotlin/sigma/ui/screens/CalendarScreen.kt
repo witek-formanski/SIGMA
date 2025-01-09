@@ -367,8 +367,8 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                     if (selected) {
                         MaterialTheme.colors.primary
                     } else {
-                        MaterialTheme.colors.onPrimary
-//                        manager.getDayColor(LocalDate.of(year, month + 1, day)) // +1 because month is 0-based
+//                        MaterialTheme.colors.onPrimary
+                        manager.getDayColor(LocalDate.of(year, month + 1, day)) // +1 because month is 0-based
                     }
                 )
                 .clickable { onDaySelected(day) },
