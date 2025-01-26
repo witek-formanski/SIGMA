@@ -11,6 +11,12 @@ import sigma.dataAccess.model.loggers.ILogger
 import sigma.dataAccess.model.parsers.IConfigurationParser
 import sigma.dataAccess.model.parsers.ITimelineParser
 import sigma.ui.screens.StartScreen
+import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import pl.edu.mimuw.sigma.generated.resources.Res
+import pl.edu.mimuw.sigma.generated.resources.title
+import pl.edu.mimuw.sigma.generated.resources.logo
 
 fun main() = application {
     val logger: ILogger = ConsoleLogger() // TODO("use DI")
@@ -21,7 +27,11 @@ fun main() = application {
     Window(onCloseRequest = {
         manager.close()
         exitApplication()
-    }) {
+    },
+
+        title = stringResource(Res.string.title),
+        icon = painterResource(Res.drawable.logo)
+        ) {
         Navigator(StartScreen(manager))
     }
 }

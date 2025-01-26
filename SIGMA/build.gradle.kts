@@ -1,10 +1,13 @@
+@file:OptIn(ExperimentalComposeLibrary::class)
+
+import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.composePlugin)
     kotlin("plugin.serialization") version "1.9.10"
-    id("org.jetbrains.compose")
-    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 group = "pl.edu.mimuw"
@@ -22,6 +25,9 @@ dependencies {
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
+    implementation(compose.components.resources)
+    testImplementation(kotlin("test"))
+    testImplementation(compose.uiTest)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     val voyagerVersion = "1.1.0-beta02"
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
@@ -33,6 +39,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
 
 compose.desktop {
     application {
