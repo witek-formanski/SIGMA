@@ -11,7 +11,6 @@ import sigma.dataAccess.model.loggers.ILogger
 import sigma.dataAccess.model.parsers.IConfigurationParser
 import sigma.dataAccess.model.parsers.ITimelineParser
 import sigma.ui.screens.StartScreen
-import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.mimuw.sigma.generated.resources.Res

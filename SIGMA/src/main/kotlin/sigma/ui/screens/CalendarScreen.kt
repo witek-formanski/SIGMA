@@ -2,6 +2,7 @@ package sigma.ui.screens
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -98,7 +100,10 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                                     selectedMonth.value -= 1
                                 }
                             }) {
-                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Month")
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Previous Month"
+                                )
                             }
                         }
                         Spacer(modifier = Modifier.weight(1f))
@@ -111,7 +116,10 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                                     selectedMonth.value += 1
                                 }
                             }) {
-                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Month")
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = "Next Month"
+                                )
                             }
                         }
                     }
@@ -364,19 +372,19 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
         Box(
             modifier = modifier
                 .background(
-                    if (selected) {
-                        MaterialTheme.colors.primary
-                    } else {
-//                        MaterialTheme.colors.onPrimary
-                        manager.getDayColor(LocalDate.of(year, month + 1, day)) // +1 because month is 0-based
-                    }
+                    manager.getDayColor(LocalDate.of(year, month + 1, day)) // +1 because month is 0-based
+                )
+                .border(
+                    width = if (selected) 2.dp else 0.dp,
+                    color = if (selected) MaterialTheme.colors.primary else Color.Transparent,
+                    shape = RoundedCornerShape(10)
                 )
                 .clickable { onDaySelected(day) },
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = day.toString(),
-                color = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary
+                color = MaterialTheme.colors.primary
             )
         }
     }
