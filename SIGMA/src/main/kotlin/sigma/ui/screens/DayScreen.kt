@@ -50,52 +50,16 @@ class DayScreen(
                 .padding(16.dp)
         ) {
             // Top Row: Navigation and Date
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = { navigator.pop() }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Back"
-                    )
-                }
-                Text(
-                    text = date.toString(),
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.h5
-                )
-                Row {
-                    val yesterday = manager.getDayState(diff - 1)
-                    if (yesterday == DayState.RECORDED || yesterday == DayState.EMPTY) {
-                        IconButton(onClick = {
-                            navigator.replace(DayScreen(manager, date.minusDays(1)))
-                        }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Previous Day"
-                            )
-                        }
-                    } else {
-                        Spacer(modifier = Modifier.width(48.dp))
-                    }
-                    val tomorrow = manager.getDayState(diff + 1)
-                    if (tomorrow == DayState.RECORDED || tomorrow == DayState.EMPTY) {
-                        IconButton(onClick = {
-                            navigator.replace(DayScreen(manager, date.plusDays(1)))
-                        }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = "Next Day"
-                            )
-                        }
-                    } else {
-                        Spacer(modifier = Modifier.width(48.dp))
-                    }
-                }
-            }
+            DayHeader(
+                modifier = Modifier
+                    .background(MaterialTheme.colors.primary)
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onBackClick = { navigator.pop() },
+                date = date.toString(),
+                onPreviousClick = { navigator.replace(DayScreen(manager, date.minusDays(1))) },
+                onNextClick = { navigator.replace(DayScreen(manager, date.plusDays(1))) }
+            )
 
             Spacer(modifier = Modifier.height(160.dp))
 
@@ -298,7 +262,69 @@ class DayScreen(
             }
         }
     }
-}
 
-private val Float.degreeToAngle
-    get() = (this * Math.PI / 180f).toFloat()
+    private val Float.degreeToAngle
+        get() = (this * Math.PI / 180f).toFloat()
+
+    @Composable
+    private fun DayHeader(
+        modifier: Modifier = Modifier,
+        onBackClick: () -> Unit,
+        onPreviousClick: () -> Unit,
+        onNextClick: () -> Unit,
+        date: String
+    ) {
+        Box(
+            modifier = modifier
+        ) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colors.onPrimary
+                )
+            }
+            Text(
+                text = date,
+                color = MaterialTheme.colors.onPrimary,
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.align(Alignment.Center)
+            )
+            Row(
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                val yesterday = manager.getDayState(diff - 1)
+                if (yesterday == DayState.RECORDED || yesterday == DayState.EMPTY) {
+                    IconButton(onClick = {
+                        onPreviousClick()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Previous Day",
+                            tint = MaterialTheme.colors.onPrimary
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.width(48.dp))
+                }
+                val tomorrow = manager.getDayState(diff + 1)
+                if (tomorrow == DayState.RECORDED || tomorrow == DayState.EMPTY) {
+                    IconButton(onClick = {
+                        onNextClick()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Next Day",
+                            tint = MaterialTheme.colors.onPrimary
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.width(48.dp))
+                }
+            }
+        }
+    }
+}

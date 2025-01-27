@@ -41,7 +41,7 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
         var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
 
         MaterialTheme {
-            Column(modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
                 SettingsHeader(
                     modifier = Modifier
                         .background(MaterialTheme.colors.primary)
@@ -85,8 +85,6 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
 
                 Spacer(modifier = Modifier.height(16.dp))
 

@@ -21,11 +21,9 @@ class HomeScreen(private val manager: ResolutionsManager) : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            Text("Welcome Back!", fontSize = 24.sp)
-            Spacer(modifier = Modifier.height(16.dp))
             HomePanel("Calendar") { navigator.push(CalendarScreen(manager)) }
             HomePanel("Today") { navigator.push(DayScreen(manager, LocalDate.now())) }
-            HomePanel("Statistics") { /* TODO */ }
+            HomePanel("Statistics") { navigator.push(StatisticsScreen(manager)) }
             HomePanel("Settings") { navigator.push(SettingsScreen(manager)) }
         }
     }
