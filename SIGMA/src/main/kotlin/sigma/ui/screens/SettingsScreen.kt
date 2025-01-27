@@ -23,10 +23,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
 import sigma.dataAccess.impl.data.Resolution
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.*
 
 class SettingsScreen(private val manager: ResolutionsManager) : Screen {
     @Composable
@@ -74,20 +70,24 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                                 manager.removeResolution(resolution.name)
                                 resolutions.removeAt(index)
                             },
-                            onModify = { /* Implement modify logic */ }
+                            onModify = { modifiedResolution ->
+                                manager.modifyResolution(resolution.name, modifiedResolution)
+                                resolutions[index] = modifiedResolution
+                            }
                         )
                     }
                     item {
-                        IconButton(onClick = { /* Implement add logic */ }) {
+                        IconButton(onClick = {
+                            val newResolution = Resolution("New resolution")
+                            manager.addResolution(newResolution)
+                            resolutions.add(newResolution)
+                        }) {
                             Icon(Icons.Default.Add, contentDescription = "Add Resolution")
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                Text("Timeline path", style = MaterialTheme.typography.h5)
-                // Draft implementation for Timeline path settings
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -104,32 +104,40 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
 
 
     @Composable
-    fun ResolutionItem(
+    private fun ResolutionItem(
         resolution: Resolution,
         onDrag: () -> Unit,
         onDrop: (Int) -> Unit,
         onDelete: () -> Unit,
-        onModify: () -> Unit
+        onModify: (Resolution) -> Unit
     ) {
+        var isDialogOpen by remember { mutableStateOf(false) }
+        var name by remember { mutableStateOf(resolution.name) }
+        var description by remember { mutableStateOf(resolution.description ?: "") }
+        var image by remember { mutableStateOf(resolution.image ?: "") }
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
                 .background(MaterialTheme.colors.surface)
                 .pointerInput(Unit) {
-//                    detectDragGestures(
-//                        onDragStart = { onDrag() },
-//                        onDragEnd = { onDrop() }
-//                    )
+                    // Uncomment to implement drag functionality
+                    // detectDragGestures(
+                    //     onDragStart = { onDrag() },
+                    //     onDragEnd = { onDrop() }
+                    // )
                 }
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(resolution.name, style = MaterialTheme.typography.body1)
                 Row {
-                    IconButton(onClick = onModify) {
+                    IconButton(onClick = { isDialogOpen = true }) {
                         Icon(Icons.Default.Edit, contentDescription = "Modify")
                     }
                     IconButton(onClick = onDelete) {
@@ -137,6 +145,49 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                     }
                 }
             }
+        }
+
+        if (isDialogOpen) {
+            AlertDialog(
+                onDismissRequest = { isDialogOpen = false },
+                title = { Text("Modify Resolution") },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = { name = it },
+                            label = { Text("Name") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = description,
+                            onValueChange = { description = it },
+                            label = { Text("Description") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = image,
+                            onValueChange = { image = it },
+                            label = { Text("Image URL") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        isDialogOpen = false
+                        val modifiedResolution = Resolution(name, description, image)
+                        onModify(modifiedResolution)
+                    }) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { isDialogOpen = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 

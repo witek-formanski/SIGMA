@@ -59,6 +59,7 @@ class ResolutionsManager(
     }
 
     fun removeResolution(name: String): Unit {
+        // validate
         val index = configuration.resolutions.indexOfFirst { it.name == name }
         if (index == -1) {
             logger.error("Cannot remove resolution \"$name\". Resolution with this name does not exist.")
@@ -75,8 +76,16 @@ class ResolutionsManager(
         logger.debug("Resolution \"$name\" removed successfully.")
     }
 
-    fun modifyResolution(): Unit {
-        TODO("enable changing name, description, and path")
+    fun modifyResolution(oldName: String, resolution: Resolution): Unit {
+        // validate
+        val index = configuration.resolutions.indexOfFirst { it.name == oldName }
+        if (index == -1) {
+            logger.error("Cannot modify resolution \"$oldName\". Resolution with this name does not exist.")
+            return
+        }
+
+        configuration.resolutions[index] = resolution
+        logger.debug("Resolution \"$oldName\" modified to \"${resolution.name}\" successfully.")
     }
 
     fun moveResolution(from: Int, to: Int): Unit {
