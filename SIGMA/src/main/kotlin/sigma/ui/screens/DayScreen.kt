@@ -11,8 +11,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,6 +29,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
 import sigma.dataAccess.impl.data.CompletionStatus
 import java.time.LocalDate
+import kotlin.math.cos
+import kotlin.math.sin
 
 class DayScreen(
     private val manager: ResolutionsManager,
@@ -75,39 +84,43 @@ class DayScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(160.dp))
 
             // Pie Chart and Score
-            Row(
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .weight(1f)
+                    .aspectRatio(1f)
             ) {
                 // Pie Chart
-                PieChart(
-                    manager.getCountOf(CompletionStatus.UNKNOWN, date),
-                    manager.getCountOf(CompletionStatus.COMPLETED, date),
-                    manager.getCountOf(CompletionStatus.PARTIAL, date),
-                    manager.getCountOf(CompletionStatus.UNCOMPLETED, date),
-                )
+                Box(
+                    modifier = Modifier.align(Alignment.Center).size(700.dp)
+                ) {
+                    PieChartWithLabels(
+                        manager.getCountOf(CompletionStatus.UNKNOWN, date),
+                        manager.getCountOf(CompletionStatus.COMPLETED, date),
+                        manager.getCountOf(CompletionStatus.PARTIAL, date),
+                        manager.getCountOf(CompletionStatus.UNCOMPLETED, date),
+                    )
+                }
 
                 // Score
                 Text(
                     text = String.format("%.2f%%", manager.getScore(date) * 100),
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colors.primary
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(200.dp)
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Resolutions Row
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .weight(1f),
                 contentAlignment = Alignment.BottomCenter
             ) {
@@ -139,37 +152,6 @@ class DayScreen(
                     )
                 )
 
-            }
-        }
-    }
-
-    @Composable
-    private fun PieChart(unknown: Int, completed: Int, partial: Int, uncompleted: Int) {
-        val total = unknown + completed + partial + uncompleted
-        val proportions = listOf(
-            unknown.toFloat() / total,
-            completed.toFloat() / total,
-            partial.toFloat() / total,
-            uncompleted.toFloat() / total
-        )
-        val colors = listOf(
-            manager.getColorOfCompletionStatus(CompletionStatus.UNKNOWN),
-            manager.getColorOfCompletionStatus(CompletionStatus.COMPLETED),
-            manager.getColorOfCompletionStatus(CompletionStatus.PARTIAL),
-            manager.getColorOfCompletionStatus(CompletionStatus.UNCOMPLETED)
-        )
-
-        Canvas(modifier = Modifier.size(200.dp)) {
-            var startAngle = 0f
-            proportions.forEachIndexed { index, proportion ->
-                val sweepAngle = proportion * 360
-                drawArc(
-                    color = colors[index],
-                    startAngle = startAngle,
-                    sweepAngle = sweepAngle,
-                    useCenter = true
-                )
-                startAngle += sweepAngle
             }
         }
     }
@@ -213,4 +195,95 @@ class DayScreen(
             }
         }
     }
+
+    @Composable
+    private fun PieChartWithLabels(unknown: Int, completed: Int, partial: Int, uncompleted: Int) {
+        val textMeasurer = rememberTextMeasurer()
+        val total = unknown + completed + partial + uncompleted
+        val proportions = listOf(
+            unknown.toFloat() / total,
+            completed.toFloat() / total,
+            partial.toFloat() / total,
+            uncompleted.toFloat() / total
+        )
+        val colors = listOf(
+            manager.getColorOfCompletionStatus(CompletionStatus.UNKNOWN),
+            manager.getColorOfCompletionStatus(CompletionStatus.COMPLETED),
+            manager.getColorOfCompletionStatus(CompletionStatus.PARTIAL),
+            manager.getColorOfCompletionStatus(CompletionStatus.UNCOMPLETED)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth(.7f)
+                    .aspectRatio(1f)
+            ) {
+                val width = size.width
+                val radius = width / 2f
+                val strokeWidth = 20.dp.toPx()
+
+                var startAngle = 0f
+
+                proportions.forEachIndexed { index, proportion ->
+
+                    val sweepAngle = proportion * 360
+                    val angleInRadians = (startAngle + sweepAngle / 2).degreeToAngle
+
+                    drawArc(
+                        color = colors[index],
+                        startAngle = startAngle,
+                        sweepAngle = sweepAngle,
+                        useCenter = false,
+                        topLeft = Offset(strokeWidth / 2, strokeWidth / 2),
+                        size = Size(width - strokeWidth, width - strokeWidth),
+                        style = Stroke(strokeWidth)
+                    )
+
+                    if (proportion > 0) {
+                        drawLine(
+                            color = Color.Black,
+                            start = Offset(
+                                radius + (radius - 20.dp.toPx()) * cos(angleInRadians),
+                                radius + (radius - 20.dp.toPx()) * sin(angleInRadians)
+                            ),
+                            end = Offset(
+                                radius + (radius - 40.dp.toPx()) * cos(angleInRadians),
+                                radius + (radius - 40.dp.toPx()) * sin(angleInRadians)
+                            ),
+                            strokeWidth = 2.dp.toPx()
+                        )
+
+                        val count = (proportion * total).toInt().toString()
+                        val textLayoutResult = textMeasurer.measure(text = AnnotatedString(count))
+
+                        drawText(
+                            text = count,
+                            textMeasurer = textMeasurer,
+                            style = TextStyle(
+                                color = Color.Black,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                            ),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            topLeft = Offset(
+                                x = radius + (radius - 60.dp.toPx()) * cos(angleInRadians) - textLayoutResult.size.width.toFloat() / 2,
+                                y = radius + (radius - 60.dp.toPx()) * sin(angleInRadians) - textLayoutResult.size.height.toFloat() / 2
+                            )
+                        )
+                    }
+
+                    startAngle += sweepAngle
+                }
+            }
+        }
+    }
 }
+
+private val Float.degreeToAngle
+    get() = (this * Math.PI / 180f).toFloat()
