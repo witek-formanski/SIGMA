@@ -10,15 +10,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.stack.popUntil
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
@@ -31,7 +30,7 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
 
         Settings(
             onBackClick = {
-                navigator.pop()
+                navigator.popUntil<HomeScreen, Screen>()
             }
         )
     }
@@ -204,7 +203,7 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.Default.Menu,
                     contentDescription = "Back",
                     tint = MaterialTheme.colors.onPrimary
                 )

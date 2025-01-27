@@ -17,7 +17,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.stack.popUntil
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
@@ -51,7 +54,7 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                 navigator.push(DayScreen(manager, LocalDate.ofInstant(it.toInstant(), ZoneId.systemDefault())))
             },
             onBackClick = {
-                navigator.pop()
+                navigator.popUntil<HomeScreen, Screen>()
             }
         )
     }
@@ -277,7 +280,7 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.Default.Menu,
                     contentDescription = "Back",
                     tint = MaterialTheme.colors.onPrimary
                 )
