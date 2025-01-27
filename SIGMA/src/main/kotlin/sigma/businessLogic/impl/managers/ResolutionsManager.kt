@@ -149,7 +149,7 @@ class ResolutionsManager(
         return Color(red, green, blue, alpha)
     }
 
-    private fun getDayState(diff: Int): DayState {
+    fun getDayState(diff: Int): DayState {
         return when {
             diff < 0 -> DayState.PAST
             diff >= timeline.days.size -> DayState.FUTURE
@@ -177,7 +177,7 @@ class ResolutionsManager(
     }
 
     private fun getDay(date: LocalDate): Day {
-        val diff = ChronoUnit.DAYS.between(timeline.startDate, date).toInt()
+        val diff = getDiff(date)
         if (diff < 0 || diff >= timeline.days.size) {
             val message = "Date $date is out of timeline range."
             logger.error(message)
@@ -220,5 +220,9 @@ class ResolutionsManager(
     fun getCountOf(completionStatus: CompletionStatus, date: LocalDate): Int {
         val day = getDay(date)
         return day.getResults().count { it == completionStatus }
+    }
+
+    fun getDiff(date: LocalDate): Int {
+        return ChronoUnit.DAYS.between(timeline.startDate, date).toInt()
     }
 }

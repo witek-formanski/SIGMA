@@ -28,6 +28,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
 import sigma.dataAccess.impl.data.CompletionStatus
+import sigma.dataAccess.impl.data.DayState
 import java.time.LocalDate
 import kotlin.math.cos
 import kotlin.math.sin
@@ -36,6 +37,7 @@ class DayScreen(
     private val manager: ResolutionsManager,
     private val date: LocalDate
 ) : Screen {
+    private val diff = manager.getDiff(date)
 
     @Composable
     override fun Content() {
@@ -65,21 +67,31 @@ class DayScreen(
                     style = MaterialTheme.typography.h5
                 )
                 Row {
-                    IconButton(onClick = {
-                        navigator.replace(DayScreen(manager, date.minusDays(1)))
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Previous Day"
-                        )
+                    val yesterday = manager.getDayState(diff - 1)
+                    if (yesterday == DayState.RECORDED || yesterday == DayState.EMPTY) {
+                        IconButton(onClick = {
+                            navigator.replace(DayScreen(manager, date.minusDays(1)))
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Previous Day"
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(48.dp))
                     }
-                    IconButton(onClick = {
-                        navigator.replace(DayScreen(manager, date.plusDays(1)))
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = "Next Day"
-                        )
+                    val tomorrow = manager.getDayState(diff + 1)
+                    if (tomorrow == DayState.RECORDED || tomorrow == DayState.EMPTY) {
+                        IconButton(onClick = {
+                            navigator.replace(DayScreen(manager, date.plusDays(1)))
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = "Next Day"
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(48.dp))
                     }
                 }
             }
