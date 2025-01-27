@@ -58,8 +58,8 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
             currentDate = currentDate.plusDays(1)
         }
 
-        val today = LocalDate.now()
-        while (currentDate.isBefore(today)) {
+        val tomorrow = LocalDate.now().plusDays(1)
+        while (currentDate.isBefore(tomorrow)) {
             timeline.days.add(Day.getEmpty(resolutionsCount))
             logger.debug("Added empty day for date: $currentDate")
             currentDate = currentDate.plusDays(1)

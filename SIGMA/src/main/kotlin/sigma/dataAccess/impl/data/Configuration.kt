@@ -16,7 +16,7 @@ data class Configuration(
                 "timeline.csv",
                 CompletionStatusWeights(1.0, 0.5, 0.0, 0.0),
                 DayColors("#4caf50","#ffc107","#f44336","#ffffff","#9e9e9e","#9e9e9e"))
-                // green, amber, red, white, grey, grey
+                // green, amber, red, grey, white, white
         }
     }
 

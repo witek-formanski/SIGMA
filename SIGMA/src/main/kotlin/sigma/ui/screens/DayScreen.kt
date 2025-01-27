@@ -1,12 +1,9 @@
 package sigma.ui.screens
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -16,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -92,12 +90,12 @@ class DayScreen(
                     manager.getCountOf(CompletionStatus.UNKNOWN, date),
                     manager.getCountOf(CompletionStatus.COMPLETED, date),
                     manager.getCountOf(CompletionStatus.PARTIAL, date),
-                    manager.getCountOf(CompletionStatus.UNCOMPLETED, date)
+                    manager.getCountOf(CompletionStatus.UNCOMPLETED, date),
                 )
 
                 // Score
                 Text(
-                    text = "${manager.getScore(date)*100}%",
+                    text = String.format("%.2f%%", manager.getScore(date) * 100),
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colors.primary
@@ -110,11 +108,12 @@ class DayScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
+                contentAlignment = Alignment.BottomCenter
             ) {
-                LazyRow(
-                    modifier = Modifier.fillMaxSize()
-                ) {
+                val state = rememberLazyListState()
+
+                LazyRow(Modifier, state) {
                     items(manager.getResolutions().size) { index ->
                         ResolutionBox(
                             resolutionName = manager.getResolutions()[index].name,
@@ -125,6 +124,13 @@ class DayScreen(
                         )
                     }
                 }
+                HorizontalScrollbar(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    adapter = rememberScrollbarAdapter(
+                        scrollState = state
+                    )
+                )
+
             }
         }
     }
@@ -133,12 +139,17 @@ class DayScreen(
     private fun PieChart(unknown: Int, completed: Int, partial: Int, uncompleted: Int) {
         val total = unknown + completed + partial + uncompleted
         val proportions = listOf(
+            unknown.toFloat() / total,
             completed.toFloat() / total,
             partial.toFloat() / total,
-            uncompleted.toFloat() / total,
-            unknown.toFloat() / total
+            uncompleted.toFloat() / total
         )
-        val colors = listOf(Color.Green, Color(0xFFFFA500), Color.Red, Color.Gray)
+        val colors = listOf(
+            manager.getColorOfCompletionStatus(CompletionStatus.UNKNOWN),
+            manager.getColorOfCompletionStatus(CompletionStatus.COMPLETED),
+            manager.getColorOfCompletionStatus(CompletionStatus.PARTIAL),
+            manager.getColorOfCompletionStatus(CompletionStatus.UNCOMPLETED)
+        )
 
         Canvas(modifier = Modifier.size(200.dp)) {
             var startAngle = 0f
@@ -168,7 +179,8 @@ class DayScreen(
                 text = resolutionName,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(8.dp))
 
