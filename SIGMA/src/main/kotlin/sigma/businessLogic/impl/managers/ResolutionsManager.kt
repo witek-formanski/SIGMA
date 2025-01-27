@@ -31,7 +31,7 @@ class ResolutionsManager(
         timelineParser.write(configuration.timelinePath, timeline)
     }
 
-    fun setConfigurationReadPath(path: String) {
+    fun setConfigurationReadPath(path: String): Unit {
         configurationReadPath = path
     }
 
@@ -103,6 +103,10 @@ class ResolutionsManager(
         return timeline.startDate
     }
 
+    fun isInRange(date: LocalDate): Boolean {
+        return !date.isBefore(timeline.startDate) && !date.isAfter(LocalDate.now())
+    }
+
     fun getDayColor(date: LocalDate): Color {
         val diff = ChronoUnit.DAYS.between(timeline.startDate, date)
         val state = getDayState(diff.toInt())
@@ -137,10 +141,10 @@ class ResolutionsManager(
     }
 
     private fun lerp(start: Color, end: Color, fraction: Float): Color {
-        val red = start.red + (end.red - start.red) * fraction
-        val green = start.green + (end.green - start.green) * fraction
-        val blue = start.blue + (end.blue - start.blue) * fraction
-        val alpha = start.alpha + (end.alpha - start.alpha) * fraction
+        val red = start.red * fraction + end.red * (1 - fraction)
+        val green = start.green * fraction + end.green * (1 - fraction)
+        val blue = start.blue * fraction + end.blue * (1 - fraction)
+        val alpha = start.alpha * fraction + end.alpha * (1 - fraction)
 
         return Color(red, green, blue, alpha)
     }

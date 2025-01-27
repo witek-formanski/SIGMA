@@ -198,20 +198,22 @@ class DayScreen(
 
     @Composable
     private fun PieChartWithLabels(unknown: Int, completed: Int, partial: Int, uncompleted: Int) {
-        val textMeasurer = rememberTextMeasurer()
-        val total = unknown + completed + partial + uncompleted
-        val proportions = listOf(
-            unknown.toFloat() / total,
-            completed.toFloat() / total,
-            partial.toFloat() / total,
-            uncompleted.toFloat() / total
+        val total = manager.getResolutions().size
+        val counts = listOf(
+            unknown,
+            completed,
+            partial,
+            uncompleted
         )
+
         val colors = listOf(
             manager.getColorOfCompletionStatus(CompletionStatus.UNKNOWN),
             manager.getColorOfCompletionStatus(CompletionStatus.COMPLETED),
             manager.getColorOfCompletionStatus(CompletionStatus.PARTIAL),
             manager.getColorOfCompletionStatus(CompletionStatus.UNCOMPLETED)
         )
+
+        val textMeasurer = rememberTextMeasurer()
 
         Box(
             modifier = Modifier
@@ -229,9 +231,9 @@ class DayScreen(
 
                 var startAngle = 0f
 
-                proportions.forEachIndexed { index, proportion ->
+                counts.forEachIndexed { index, count ->
 
-                    val sweepAngle = proportion * 360
+                    val sweepAngle = count.toFloat() / total * 360
                     val angleInRadians = (startAngle + sweepAngle / 2).degreeToAngle
 
                     drawArc(
@@ -244,7 +246,7 @@ class DayScreen(
                         style = Stroke(strokeWidth)
                     )
 
-                    if (proportion > 0) {
+                    if (count > 0) {
                         drawLine(
                             color = Color.Black,
                             start = Offset(
@@ -258,11 +260,11 @@ class DayScreen(
                             strokeWidth = 2.dp.toPx()
                         )
 
-                        val count = (proportion * total).toInt().toString()
-                        val textLayoutResult = textMeasurer.measure(text = AnnotatedString(count))
+                        val countString = count.toString()
+                        val textLayoutResult = textMeasurer.measure(text = AnnotatedString(countString))
 
                         drawText(
-                            text = count,
+                            text = countString,
                             textMeasurer = textMeasurer,
                             style = TextStyle(
                                 color = Color.Black,
