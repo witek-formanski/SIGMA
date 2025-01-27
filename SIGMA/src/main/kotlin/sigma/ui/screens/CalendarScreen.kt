@@ -99,6 +99,7 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                                 } else {
                                     selectedMonth.value -= 1
                                 }
+                                selectedDay.value = 1
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -115,6 +116,7 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                                 } else {
                                     selectedMonth.value += 1
                                 }
+                                selectedDay.value = 1
                             }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -131,8 +133,14 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                             year = selectedYear.value,
                             minYear = minYear,
                             maxYear = maxYear,
-                            onMonthSelected = { selectedMonth.value = it },
-                            onYearSelected = { selectedYear.value = it },
+                            onMonthSelected = {
+                                selectedMonth.value = it
+                                selectedDay.value = 1
+                            },
+                            onYearSelected = {
+                                selectedYear.value = it
+                                selectedDay.value = 1
+                            },
                             modifier = Modifier.fillMaxWidth().padding(8.dp)
                         )
 
@@ -159,6 +167,13 @@ class CalendarScreen(private val manager: ResolutionsManager) : Screen {
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.primary,
                             contentColor = MaterialTheme.colors.onPrimary
+                        ),
+                        enabled = manager.isInRange(
+                            LocalDate.of(
+                                selectedYear.value,
+                                selectedMonth.value + 1,
+                                selectedDay.value
+                            )
                         )
                     ) {
                         Text(
