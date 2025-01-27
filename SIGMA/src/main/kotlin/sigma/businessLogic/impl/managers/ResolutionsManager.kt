@@ -171,4 +171,50 @@ class ResolutionsManager(
                 weights.uncompleted * uncompleted + weights.unknown * unknown
         return (success / total).toFloat()
     }
+
+    private fun getDay(date: LocalDate): Day {
+        val diff = ChronoUnit.DAYS.between(timeline.startDate, date).toInt()
+        if (diff < 0 || diff >= timeline.days.size) {
+            val message = "Date $date is out of timeline range."
+            logger.error(message)
+            throw IllegalArgumentException(message)
+        }
+
+        return timeline.days[diff]
+    }
+
+    fun getScore(date: LocalDate): Double {
+        val day = getDay(date)
+        val statuses = day.getResults()
+        val weights = configuration.completionStatusWeights
+
+        val score = statuses.sumOf { status ->
+            when (status) {
+                CompletionStatus.COMPLETED -> weights.completed
+                CompletionStatus.PARTIAL -> weights.partial
+                CompletionStatus.UNCOMPLETED -> weights.uncompleted
+                CompletionStatus.UNKNOWN -> weights.unknown
+            }
+        }
+
+        return score / configuration.resolutions.size
+    }
+
+    fun getColorOfCompletionStatus(completionStatus: CompletionStatus): Color {
+        return when (completionStatus) {
+            CompletionStatus.COMPLETED -> colorFromString(configuration.dayColors.success)
+            CompletionStatus.PARTIAL -> colorFromString(configuration.dayColors.partial)
+            CompletionStatus.UNCOMPLETED -> colorFromString(configuration.dayColors.failure)
+            CompletionStatus.UNKNOWN -> colorFromString(configuration.dayColors.empty)
+        }
+    }
+
+    fun getCompletionStatus(date: LocalDate, index: Int): CompletionStatus {
+        return getDay(date)[index]
+    }
+
+    fun getCountOf(completionStatus: CompletionStatus, date: LocalDate): Int {
+        val day = getDay(date)
+        return day.getResults().count { it == completionStatus }
+    }
 }

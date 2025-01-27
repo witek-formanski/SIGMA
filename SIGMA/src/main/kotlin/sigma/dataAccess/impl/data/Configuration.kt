@@ -15,8 +15,8 @@ data class Configuration(
                 mutableListOf(),
                 "timeline.csv",
                 CompletionStatusWeights(1.0, 0.5, 0.0, 0.0),
-                DayColors("#00FF00FF", "#FF0000FF", "#FFFFFFFF", "#0000FFFF", "#000000FF"))
-                // green, red, white, blue, black
+                DayColors("#4caf50","#ffc107","#f44336","#ffffff","#9e9e9e","#9e9e9e"))
+                // green, amber, red, white, grey, grey
         }
     }
 
@@ -36,6 +36,7 @@ data class CompletionStatusWeights(
 @Serializable
 data class DayColors(
     val success: String,
+    val partial: String,
     val failure: String,
     val empty: String,
     val future: String,

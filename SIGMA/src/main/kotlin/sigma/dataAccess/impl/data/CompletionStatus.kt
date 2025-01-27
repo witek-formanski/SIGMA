@@ -1,6 +1,6 @@
 package sigma.dataAccess.impl.data
 
-enum class CompletionStatus(val code: String) {
+enum class CompletionStatus(private val code: String) {
     UNKNOWN("0"),
     COMPLETED("1"),
     PARTIAL("2"),
