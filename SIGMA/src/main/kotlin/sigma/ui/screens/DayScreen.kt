@@ -128,6 +128,14 @@ class DayScreen(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     adapter = rememberScrollbarAdapter(
                         scrollState = state
+                    ),
+                    style = ScrollbarStyle(
+                        hoverColor = MaterialTheme.colors.primary,
+                        unhoverColor = MaterialTheme.colors.primary.copy(alpha = 0.5f),
+                        minimalHeight = 16.dp,
+                        thickness = 8.dp,
+                        shape = MaterialTheme.shapes.small,
+                        hoverDurationMillis = 100
                     )
                 )
 
@@ -170,8 +178,8 @@ class DayScreen(
     private fun ResolutionBox(resolutionName: String, completionStatus: CompletionStatus, color: Color) {
         Column(
             modifier = Modifier
-                .padding(8.dp)
-                .size(100.dp),
+                .padding(16.dp)
+                .size(150.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
@@ -187,7 +195,7 @@ class DayScreen(
             // Status Box
             Box(
                 modifier = Modifier
-                    .size(50.dp)
+                    .size(100.dp)
                     .background(color),
                 contentAlignment = Alignment.Center
             ) {
