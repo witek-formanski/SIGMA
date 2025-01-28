@@ -39,6 +39,7 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
     private fun Settings(onBackClick: () -> Unit) {
         val resolutions = remember { mutableStateListOf(*manager.getResolutions().toTypedArray()) }
         var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
+        var newResolutionIndex by remember { mutableStateOf(-1) }
 
         MaterialTheme {
             Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
@@ -55,6 +56,12 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                 Text("Resolutions", style = MaterialTheme.typography.h5)
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     itemsIndexed(resolutions) { index, resolution ->
+                        var dialog = false
+                        if (index == newResolutionIndex) {
+                            newResolutionIndex = -1
+                            dialog = true
+                        }
+
                         ResolutionItem(
                             resolution = resolution,
                             onDrag = { draggedItemIndex = index },
@@ -72,13 +79,15 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                             onModify = { modifiedResolution ->
                                 manager.modifyResolution(resolution.name, modifiedResolution)
                                 resolutions[index] = modifiedResolution
-                            }
+                            },
+                            dialog = dialog
                         )
                     }
                     item {
                         IconButton(onClick = {
-                            val newResolution = Resolution("New resolution")
+                            val newResolution = Resolution("")
                             manager.addResolution(newResolution)
+                            newResolutionIndex = resolutions.size
                             resolutions.add(newResolution)
                         }) {
                             Icon(Icons.Default.Add, contentDescription = "Add Resolution")
@@ -106,9 +115,10 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
         onDrag: () -> Unit,
         onDrop: (Int) -> Unit,
         onDelete: () -> Unit,
-        onModify: (Resolution) -> Unit
+        onModify: (Resolution) -> Unit,
+        dialog: Boolean
     ) {
-        var isDialogOpen by remember { mutableStateOf(false) }
+        var isDialogOpen by remember { mutableStateOf(dialog) }
         var name by remember { mutableStateOf(resolution.name) }
         var description by remember { mutableStateOf(resolution.description ?: "") }
         var image by remember { mutableStateOf(resolution.image ?: "") }
@@ -180,7 +190,12 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                     }
                 },
                 dismissButton = {
-                    Button(onClick = { isDialogOpen = false }) {
+                    Button(onClick = {
+                        isDialogOpen = false
+                        if (resolution.name.isEmpty()) {
+                            onDelete()
+                        }
+                    }) {
                         Text("Cancel")
                     }
                 }
