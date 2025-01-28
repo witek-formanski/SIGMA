@@ -185,7 +185,7 @@ class ResolutionsManager(
         return (success / total).toFloat()
     }
 
-    private fun getDay(date: LocalDate): Day {
+    fun getDay(date: LocalDate): Day {
         val diff = getDiff(date)
         if (diff < 0 || diff >= timeline.days.size) {
             val message = "Date $date is out of timeline range."
@@ -233,5 +233,17 @@ class ResolutionsManager(
 
     fun getDiff(date: LocalDate): Int {
         return ChronoUnit.DAYS.between(timeline.startDate, date).toInt()
+    }
+
+    fun setCompletionStatus(date: LocalDate, resolutionName: String, status: CompletionStatus) {
+        val day = getDay(date)
+        val index = configuration.resolutions.indexOfFirst { it.name == resolutionName }
+        if (index == -1) {
+            val message = "Cannot set completion status for resolution \"$resolutionName\". Resolution with this name does not exist."
+            logger.error(message)
+            throw IllegalArgumentException(message)
+        }
+
+        day[index] = status
     }
 }

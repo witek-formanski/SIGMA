@@ -38,6 +38,18 @@ class Day {
         return statuses[index]
     }
 
+    operator fun set(index: Int, completionStatus: CompletionStatus): Unit {
+        statuses[index] = completionStatus
+    }
+
+    fun getStatusesCounts(): List<Int> {
+        val counts = MutableList(CompletionStatus.entries.size) { 0 }
+        for (status in statuses) {
+            counts[status.ordinal]++
+        }
+        return counts
+    }
+
     companion object {
         fun getEmpty(resolutionsCount: Int): Day {
             val day = Day()

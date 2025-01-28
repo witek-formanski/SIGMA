@@ -9,7 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -29,6 +29,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import sigma.businessLogic.impl.managers.ResolutionsManager
 import sigma.dataAccess.impl.data.CompletionStatus
+import sigma.dataAccess.impl.data.Day
 import sigma.dataAccess.impl.data.DayState
 import java.time.LocalDate
 import kotlin.math.cos
@@ -43,6 +44,11 @@ class DayScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+
+        val day by derivedStateOf { manager.getDay(date) }
+
+        val resolutions by derivedStateOf { manager.getResolutions() }
+        val score by derivedStateOf { manager.getScore(date) }
 
         Column(
             modifier = Modifier
@@ -75,16 +81,13 @@ class DayScreen(
                     modifier = Modifier.align(Alignment.Center).size(700.dp)
                 ) {
                     PieChartWithLabels(
-                        manager.getCountOf(CompletionStatus.UNKNOWN, date),
-                        manager.getCountOf(CompletionStatus.COMPLETED, date),
-                        manager.getCountOf(CompletionStatus.PARTIAL, date),
-                        manager.getCountOf(CompletionStatus.UNCOMPLETED, date),
+                        day = day,
                     )
                 }
 
                 // Score
                 Text(
-                    text = String.format("%.2f%%", manager.getScore(date) * 100),
+                    text = String.format("%.2f%%", score * 100),
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colors.primary,
@@ -104,13 +107,10 @@ class DayScreen(
                 val state = rememberLazyListState()
 
                 LazyRow(Modifier, state) {
-                    items(manager.getResolutions().size) { index ->
+                    items(resolutions.size) { index ->
                         ResolutionBox(
-                            resolutionName = manager.getResolutions()[index].name,
-                            completionStatus = manager.getCompletionStatus(date, index),
-                            color = manager.getColorOfCompletionStatus(
-                                manager.getCompletionStatus(date, index)
-                            )
+                            index = index,
+                            day = day
                         )
                     }
                 }
@@ -128,22 +128,25 @@ class DayScreen(
                         hoverDurationMillis = 100
                     )
                 )
-
             }
         }
     }
 
+
     @Composable
-    private fun ResolutionBox(resolutionName: String, completionStatus: CompletionStatus, color: Color) {
+    private fun ResolutionBox(index: Int, day: Day) {
+        var showDialog by remember { mutableStateOf(false) }
+
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .size(150.dp),
+                .size(150.dp)
+                .clickable { showDialog = true },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
             Text(
-                text = resolutionName,
+                text = manager.getResolutions()[index].name,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -155,11 +158,11 @@ class DayScreen(
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .background(color),
+                    .background(manager.getColorOfCompletionStatus(day[index]), MaterialTheme.shapes.medium),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = when (completionStatus) {
+                    text = when (day[index]) {
                         CompletionStatus.UNKNOWN -> "?"
                         CompletionStatus.COMPLETED -> "✔"
                         CompletionStatus.PARTIAL -> "±"
@@ -171,17 +174,42 @@ class DayScreen(
                 )
             }
         }
+
+        // Dialog to change completion status
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Change Completion Status") },
+                text = {
+                    Column {
+                        CompletionStatus.values().forEach { status ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        manager.setCompletionStatus(date, manager.getResolutions()[index].name, status)
+                                        day[index] = status
+                                        showDialog = false
+                                    }
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(
+                                    text = status.name,
+                                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                                )
+                            }
+                        }
+                    }
+                },
+                confirmButton = { TextButton(onClick = { showDialog = false }) { Text("Cancel") } }
+            )
+        }
     }
 
+
     @Composable
-    private fun PieChartWithLabels(unknown: Int, completed: Int, partial: Int, uncompleted: Int) {
+    private fun PieChartWithLabels(day: Day) {
         val total = manager.getResolutions().size
-        val counts = listOf(
-            unknown,
-            completed,
-            partial,
-            uncompleted
-        )
 
         val colors = listOf(
             manager.getColorOfCompletionStatus(CompletionStatus.UNKNOWN),
@@ -208,10 +236,10 @@ class DayScreen(
 
                 var startAngle = 0f
 
-                counts.forEachIndexed { index, count ->
+                day.getStatusesCounts().forEachIndexed { index, count ->
 
                     val sweepAngle = count.toFloat() / total * 360
-                    val angleInRadians = (startAngle + sweepAngle / 2).degreeToAngle
+                    val angleInRadians = ((startAngle + sweepAngle / 2) * Math.PI / 180f).toFloat()
 
                     drawArc(
                         color = colors[index],
@@ -262,9 +290,6 @@ class DayScreen(
             }
         }
     }
-
-    private val Float.degreeToAngle
-        get() = (this * Math.PI / 180f).toFloat()
 
     @Composable
     private fun DayHeader(
