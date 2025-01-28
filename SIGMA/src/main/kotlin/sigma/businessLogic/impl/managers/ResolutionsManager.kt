@@ -239,11 +239,45 @@ class ResolutionsManager(
         val day = getDay(date)
         val index = configuration.resolutions.indexOfFirst { it.name == resolutionName }
         if (index == -1) {
-            val message = "Cannot set completion status for resolution \"$resolutionName\". Resolution with this name does not exist."
+            val message =
+                "Cannot set completion status for resolution \"$resolutionName\". Resolution with this name does not exist."
             logger.error(message)
             throw IllegalArgumentException(message)
         }
 
         day[index] = status
+    }
+
+    fun getMonthStatusesCounts(date: LocalDate): List<Int> {
+        val startOfMonth = date.withDayOfMonth(1)
+        val endOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+        val counts = mutableListOf(0, 0, 0, 0)
+
+        for (day in startOfMonth.datesUntil(endOfMonth.plusDays(1))) {
+            if (isInRange(day)) {
+                val dayCounts = getDay(day).getStatusesCounts()
+                for (i in counts.indices) {
+                    counts[i] += dayCounts[i]
+                }
+            }
+        }
+
+        return counts
+    }
+
+    fun getMonthScore(date: LocalDate): Double {
+        val startOfMonth = date.withDayOfMonth(1)
+        val endOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+        var totalScore = 0.0
+        var daysCount = 0
+
+        for (day in startOfMonth.datesUntil(endOfMonth.plusDays(1))) {
+            if (isInRange(day)) {
+                totalScore += getScore(day)
+                daysCount++
+            }
+        }
+
+        return if (daysCount > 0) totalScore / daysCount else 0.0
     }
 }

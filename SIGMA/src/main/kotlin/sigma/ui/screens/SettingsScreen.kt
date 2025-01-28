@@ -93,14 +93,14 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+//                Spacer(modifier = Modifier.height(16.dp))
 
-                Text("Completion status weights", style = MaterialTheme.typography.h5)
+//                Text("Completion status weights", style = MaterialTheme.typography.h5)
                 // Draft implementation for Completion status weights settings
 
-                Spacer(modifier = Modifier.height(16.dp))
+//                Spacer(modifier = Modifier.height(16.dp))
 
-                Text("Day colors", style = MaterialTheme.typography.h5)
+//                Text("Day colors", style = MaterialTheme.typography.h5)
                 // Draft implementation for Day colors settings
             }
         }
