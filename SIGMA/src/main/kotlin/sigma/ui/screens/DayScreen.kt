@@ -45,17 +45,18 @@ class DayScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val day by derivedStateOf { manager.getDay(date) }
+        // Use mutableStateOf instead of derivedStateOf to ensure recomposition
+        var day by remember { mutableStateOf(manager.getDay(date)) }
+        var score by remember { mutableStateOf(manager.getScore(date)) }
 
-        val resolutions by derivedStateOf { manager.getResolutions() }
-        val score by derivedStateOf { manager.getScore(date) }
+        // The resolutions list typically doesn't change as frequently:
+        val resolutions = remember { manager.getResolutions() }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Top Row: Navigation and Date
             DayHeader(
                 modifier = Modifier
                     .background(MaterialTheme.colors.primary)
@@ -63,8 +64,18 @@ class DayScreen(
                     .padding(16.dp),
                 onBackClick = { navigator.pop() },
                 date = date.toString(),
-                onPreviousClick = { navigator.replace(DayScreen(manager, date.minusDays(1))) },
-                onNextClick = { navigator.replace(DayScreen(manager, date.plusDays(1))) }
+                onPreviousClick = {
+                    val newDate = date.minusDays(1)
+                    day = manager.getDay(newDate)
+                    score = manager.getScore(newDate)
+                    navigator.replace(DayScreen(manager, newDate))
+                },
+                onNextClick = {
+                    val newDate = date.plusDays(1)
+                    day = manager.getDay(newDate)
+                    score = manager.getScore(newDate)
+                    navigator.replace(DayScreen(manager, newDate))
+                }
             )
 
             Spacer(modifier = Modifier.height(160.dp))
@@ -76,16 +87,12 @@ class DayScreen(
                     .weight(1f)
                     .aspectRatio(1f)
             ) {
-                // Pie Chart
                 Box(
                     modifier = Modifier.align(Alignment.Center).size(700.dp)
                 ) {
-                    PieChartWithLabels(
-                        day = day,
-                    )
+                    PieChartWithLabels(day = day)
                 }
 
-                // Score
                 Text(
                     text = String.format("%.2f%%", score * 100),
                     fontSize = 48.sp,
@@ -110,15 +117,21 @@ class DayScreen(
                     items(resolutions.size) { index ->
                         ResolutionBox(
                             index = index,
-                            day = day
+                            day = day,
+                            onStatusChanged = { newStatus ->
+                                // Update status in the manager
+                                manager.setCompletionStatus(date, manager.getResolutions()[index].name, newStatus)
+
+                                // Update local day data and recompute score to trigger recomposition
+                                day = manager.getDay(date)
+                                score = manager.getScore(date)
+                            }
                         )
                     }
                 }
                 HorizontalScrollbar(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    adapter = rememberScrollbarAdapter(
-                        scrollState = state
-                    ),
+                    adapter = rememberScrollbarAdapter(scrollState = state),
                     style = ScrollbarStyle(
                         hoverColor = MaterialTheme.colors.primary,
                         unhoverColor = MaterialTheme.colors.primary.copy(alpha = 0.5f),
@@ -132,9 +145,12 @@ class DayScreen(
         }
     }
 
-
     @Composable
-    private fun ResolutionBox(index: Int, day: Day) {
+    private fun ResolutionBox(
+        index: Int,
+        day: Day,
+        onStatusChanged: (CompletionStatus) -> Unit
+    ) {
         var showDialog by remember { mutableStateOf(false) }
 
         Column(
@@ -144,7 +160,6 @@ class DayScreen(
                 .clickable { showDialog = true },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
             Text(
                 text = manager.getResolutions()[index].name,
                 fontSize = 12.sp,
@@ -154,7 +169,6 @@ class DayScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Status Box
             Box(
                 modifier = Modifier
                     .size(100.dp)
@@ -175,20 +189,18 @@ class DayScreen(
             }
         }
 
-        // Dialog to change completion status
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
                 title = { Text("Change Completion Status") },
                 text = {
                     Column {
-                        CompletionStatus.values().forEach { status ->
+                        CompletionStatus.entries.forEach { status ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        manager.setCompletionStatus(date, manager.getResolutions()[index].name, status)
-                                        day[index] = status
+                                        onStatusChanged(status)
                                         showDialog = false
                                     }
                                     .padding(vertical = 8.dp)
@@ -201,11 +213,14 @@ class DayScreen(
                         }
                     }
                 },
-                confirmButton = { TextButton(onClick = { showDialog = false }) { Text("Cancel") } }
+                confirmButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
             )
         }
     }
-
 
     @Composable
     private fun PieChartWithLabels(day: Day) {
@@ -237,7 +252,6 @@ class DayScreen(
                 var startAngle = 0f
 
                 day.getStatusesCounts().forEachIndexed { index, count ->
-
                     val sweepAngle = count.toFloat() / total * 360
                     val angleInRadians = ((startAngle + sweepAngle / 2) * Math.PI / 180f).toFloat()
 
@@ -299,9 +313,7 @@ class DayScreen(
         onNextClick: () -> Unit,
         date: String
     ) {
-        Box(
-            modifier = modifier
-        ) {
+        Box(modifier = modifier) {
             IconButton(
                 onClick = onBackClick,
                 modifier = Modifier.align(Alignment.CenterStart)
@@ -323,9 +335,7 @@ class DayScreen(
             ) {
                 val yesterday = manager.getDayState(diff - 1)
                 if (yesterday == DayState.RECORDED || yesterday == DayState.EMPTY) {
-                    IconButton(onClick = {
-                        onPreviousClick()
-                    }) {
+                    IconButton(onClick = { onPreviousClick() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Previous Day",
@@ -337,9 +347,7 @@ class DayScreen(
                 }
                 val tomorrow = manager.getDayState(diff + 1)
                 if (tomorrow == DayState.RECORDED || tomorrow == DayState.EMPTY) {
-                    IconButton(onClick = {
-                        onNextClick()
-                    }) {
+                    IconButton(onClick = { onNextClick() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = "Next Day",
