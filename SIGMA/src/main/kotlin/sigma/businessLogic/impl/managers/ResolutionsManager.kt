@@ -5,6 +5,7 @@ import sigma.dataAccess.impl.data.*
 import sigma.dataAccess.model.loggers.ILogger
 import sigma.dataAccess.model.parsers.IConfigurationParser
 import sigma.dataAccess.model.parsers.ITimelineParser
+import java.io.File
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -14,8 +15,8 @@ class ResolutionsManager(
     private val configurationParser: IConfigurationParser,
     private val timelineParser: ITimelineParser
 ) {
-    private var configurationWritePath: String = "appsettings.json"
-    private var configurationReadPath: String = configurationWritePath
+    private var configurationWritePath: File = File("appsettings.json")
+    private var configurationReadPath: File = configurationWritePath
     private var configuration: Configuration = Configuration.getDefault()
     private var timeline: Timeline = Timeline.getDefault()
 
@@ -31,7 +32,7 @@ class ResolutionsManager(
         timelineParser.write(configuration.timelinePath, timeline)
     }
 
-    fun setConfigurationReadPath(path: String): Unit {
+    fun setConfigurationReadPath(path: File): Unit {
         configurationReadPath = path
     }
 

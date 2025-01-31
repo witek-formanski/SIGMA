@@ -40,7 +40,7 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
         var newResolutionIndex by remember { mutableStateOf(-1) }
 
         MaterialTheme {
-            Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
                 SettingsHeader(
                     modifier = Modifier
                         .background(MaterialTheme.colors.primary)
@@ -92,16 +92,6 @@ class SettingsScreen(private val manager: ResolutionsManager) : Screen {
                         }
                     }
                 }
-
-//                Spacer(modifier = Modifier.height(16.dp))
-
-//                Text("Completion status weights", style = MaterialTheme.typography.h5)
-                // Draft implementation for Completion status weights settings
-
-//                Spacer(modifier = Modifier.height(16.dp))
-
-//                Text("Day colors", style = MaterialTheme.typography.h5)
-                // Draft implementation for Day colors settings
             }
         }
     }

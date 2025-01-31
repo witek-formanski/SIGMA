@@ -10,10 +10,9 @@ import java.io.File
 class JsonConfigurationParser(
     private var logger: ILogger
 ) : IConfigurationParser {
-    override fun read(path: String): Configuration {
-        val file = File(path)
+    override fun read(file: File): Configuration {
         if (!file.exists()) {
-            val message = "Configuration file not found: $path."
+            val message = "Configuration file not found: ${file.path}."
             logger.error(message)
             throw IllegalArgumentException(message)
         }
@@ -26,18 +25,18 @@ class JsonConfigurationParser(
             logger.error(message)
             throw IllegalArgumentException(message, e)
         }
-        logger.debug("Configuration read from file: $path.")
+        logger.debug("Configuration read from file: ${file.path}.")
         return configuration
     }
 
-    override fun write(path: String, configuration: Configuration): Unit {
+    override fun write(file: File, configuration: Configuration): Unit {
         try {
-            File(path).writeText(Json.encodeToString(configuration))
+            file.writeText(Json.encodeToString(configuration))
         } catch (e: Exception) {
-            val message = "Failed to save configuration to file: $path."
+            val message = "Failed to save configuration to file: ${file.path}."
             logger.error(message)
             throw IllegalArgumentException(message, e)
         }
-        logger.debug("Configuration saved to file: $path.")
+        logger.debug("Configuration saved to file: ${file.path}.")
     }
 }

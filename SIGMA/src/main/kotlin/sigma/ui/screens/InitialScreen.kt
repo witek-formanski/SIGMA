@@ -41,7 +41,7 @@ class InitialScreen(private val manager: ResolutionsManager) : Screen {
                 try {
                     val selectedFile = selectConfigurationFile()
                     if (selectedFile != null) {
-                        manager.setConfigurationReadPath(selectedFile.path)
+                        manager.setConfigurationReadPath(selectedFile)
                         manager.tryInit()
                         importStatus = "Successfully imported: ${selectedFile.name}"
                         navigator.replace(HomeScreen(manager))
