@@ -1,13 +1,14 @@
+package sigma.businessLogic.impl.managers
+
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
-import sigma.businessLogic.impl.managers.ResolutionsManager
 import sigma.dataAccess.impl.data.*
 import sigma.dataAccess.model.loggers.ILogger
 import sigma.dataAccess.model.parsers.IConfigurationParser
 import sigma.dataAccess.model.parsers.ITimelineParser
-import java.io.File
 import kotlin.test.assertEquals
+import org.mockito.kotlin.any
 
 class ResolutionsManagerTest {
 
@@ -22,9 +23,8 @@ class ResolutionsManagerTest {
         configurationParser = mock(IConfigurationParser::class.java)
         timelineParser = mock(ITimelineParser::class.java)
 
-        // Ensure getDefault returns a mutable configuration
-        `when`(configurationParser.read(any(File::class.java)))
-            .thenReturn(Configuration.getDefault().copy(resolutions = mutableListOf()))
+        `when`(configurationParser.read(any())).thenReturn(Configuration.getDefault())
+        `when`(timelineParser.read(any(), any())).thenReturn(Timeline.getDefault())
 
         resolutionsManager = ResolutionsManager(logger, configurationParser, timelineParser)
         resolutionsManager.tryInit() // Initialize before each test
