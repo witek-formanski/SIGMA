@@ -3,6 +3,7 @@ package sigma.dataAccess.impl.parsers
 import sigma.dataAccess.impl.data.Timeline
 import sigma.dataAccess.impl.data.CompletionStatus
 import sigma.dataAccess.impl.data.Day
+import sigma.dataAccess.impl.data.DayState
 import sigma.dataAccess.model.parsers.ITimelineParser
 import sigma.dataAccess.model.loggers.ILogger
 import java.io.File
@@ -13,14 +14,16 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
         logger.debug("Starting to read timeline from file: $path")
         val file = File(path)
         if (!file.exists()) {
-            logger.error("Timeline file not found: $path")
-            throw IllegalArgumentException("Timeline file not found: $path")
+            val message = "Timeline file not found: $path."
+            logger.error(message)
+            throw IllegalArgumentException(message)
         }
 
         val lines = file.readLines()
         if (lines.isEmpty()) {
-            logger.error("Timeline file is empty: $path")
-            throw IllegalArgumentException("Timeline file is empty.")
+            val message = "Timeline file is empty: $path."
+            logger.error(message)
+            throw IllegalArgumentException(message)
         }
 
         val dateResolutionStatuses = lines.map { line ->
@@ -32,8 +35,9 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
         }
 
         if (dateResolutionStatuses.any { it.second.size != resolutionsCount }) {
-            logger.error("All days must have the same number of statuses as the first day.")
-            throw IllegalArgumentException("All days must have the same number of statuses as the first day.")
+            val message = "All days must have the same number of statuses as the first day."
+            logger.error(message)
+            throw IllegalArgumentException(message)
         }
 
         val startDate = dateResolutionStatuses.first().first
@@ -48,30 +52,35 @@ class CsvTimelineParser(private val logger: ILogger) : ITimelineParser {
             }
             val day = Day()
             statuses.forEach { day.add(it) }
+            day.updateState()
             timeline.days.add(day)
             logger.debug("Added day for date: $date with statuses: $statuses")
             currentDate = currentDate.plusDays(1)
         }
 
-        val today = LocalDate.now()
-        while (currentDate.isBefore(today)) {
+        val tomorrow = LocalDate.now().plusDays(1)
+        while (currentDate.isBefore(tomorrow)) {
             timeline.days.add(Day.getEmpty(resolutionsCount))
             logger.debug("Added empty day for date: $currentDate")
             currentDate = currentDate.plusDays(1)
         }
 
-        logger.debug("Finished reading timeline. Total days: ${timeline.days.size}")
+        logger.debug("Finished reading timeline from $path. Total days: ${timeline.days.size}")
         return timeline
     }
 
     override fun write(path: String, timeline: Timeline) {
         logger.debug("Writing timeline to file: $path")
-        val lines = timeline.days.mapIndexed { index, day ->
-            val date = timeline.startDate.plusDays(index.toLong()).toString()
-            val statuses = day.getResults().joinToString(",") { it.toString() }
-            "$date,$statuses"
+        val lines = timeline.days.mapIndexedNotNull { index, day ->
+            if (day.getState() != DayState.EMPTY) {
+                val date = timeline.startDate.plusDays(index.toLong()).toString()
+                val statuses = day.getResults().joinToString(",") { it.toString() }
+                "$date,$statuses"
+            } else {
+                null
+            }
         }
         File(path).writeText(lines.joinToString("\n"))
-        logger.debug("Finished writing timeline. Total days: ${timeline.days.size}")
+        logger.debug("Finished writing timeline tp $path. Total days: ${timeline.days.size}")
     }
 }

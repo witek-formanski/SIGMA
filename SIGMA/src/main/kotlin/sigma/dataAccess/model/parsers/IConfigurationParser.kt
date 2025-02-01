@@ -1,8 +1,9 @@
 package sigma.dataAccess.model.parsers
 
 import sigma.dataAccess.impl.data.Configuration
+import java.io.File
 
 interface IConfigurationParser {
-    fun read(path: String) : Configuration
-    fun write(path: String, configuration: Configuration) : Unit
+    fun read(path: File) : Configuration
+    fun write(path: File, configuration: Configuration) : Unit
 }

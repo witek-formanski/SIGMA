@@ -16,9 +16,7 @@ import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
 
-class InitialScreen(
-    private val manager: ResolutionsManager
-) : Screen {
+class InitialScreen(private val manager: ResolutionsManager) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -43,10 +41,10 @@ class InitialScreen(
                 try {
                     val selectedFile = selectConfigurationFile()
                     if (selectedFile != null) {
-                        manager.setConfigurationReadPath(selectedFile.path)
+                        manager.setConfigurationReadPath(selectedFile)
                         manager.tryInit()
                         importStatus = "Successfully imported: ${selectedFile.name}"
-                        navigator.replace(HomeScreen(manager!!))
+                        navigator.replace(HomeScreen(manager))
                     } else {
                         importStatus = "No file selected"
                     }

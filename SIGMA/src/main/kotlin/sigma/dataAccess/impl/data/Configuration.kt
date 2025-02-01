@@ -6,12 +6,17 @@ import kotlinx.serialization.Serializable
 data class Configuration(
     var resolutions: MutableList<Resolution>,
     val timelinePath: String,
-    val completionStatusWeights: CompletionStatusWeights? = null,
-    val dayColors: DayColors? = null
+    val completionStatusWeights: CompletionStatusWeights,
+    val dayColors: DayColors
 ) {
     companion object {
         fun getDefault(): Configuration {
-            return Configuration(mutableListOf(), "C:\\Program Files\\Sigma\\timeline.csv")
+            return Configuration(
+                mutableListOf(),
+                "timeline.csv",
+                CompletionStatusWeights(1.0, 0.5, 0.0, 0.0),
+                DayColors("#4caf50","#ffc107","#f44336","#ffffff","#9e9e9e","#9e9e9e"))
+                // green, amber, red, grey, white, white
         }
     }
 
@@ -31,7 +36,9 @@ data class CompletionStatusWeights(
 @Serializable
 data class DayColors(
     val success: String,
+    val partial: String,
     val failure: String,
     val empty: String,
-    val future: String
+    val future: String,
+    val past: String
 )
