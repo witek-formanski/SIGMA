@@ -187,14 +187,7 @@ class ResolutionsManager(
     }
 
     fun getDay(date: LocalDate): Day {
-        val diff = getDiff(date)
-        if (diff < 0 || diff >= timeline.days.size) {
-            val message = "Date $date is out of timeline range."
-            logger.error(message)
-            throw IllegalArgumentException(message)
-        }
-
-        return timeline.days[diff]
+        return timeline.days[getDiff(date)]
     }
 
     fun getScore(date: LocalDate): Double {
@@ -233,7 +226,14 @@ class ResolutionsManager(
     }
 
     fun getDiff(date: LocalDate): Int {
-        return ChronoUnit.DAYS.between(timeline.startDate, date).toInt()
+        val diff = ChronoUnit.DAYS.between(timeline.startDate, date).toInt()
+        if (diff < 0 || diff >= timeline.days.size) {
+            val message = "Date $date is out of timeline range."
+            logger.error(message)
+            throw IllegalArgumentException(message)
+        }
+
+        return diff
     }
 
     fun setCompletionStatus(date: LocalDate, resolutionName: String, status: CompletionStatus) {
@@ -247,6 +247,7 @@ class ResolutionsManager(
         }
 
         day[index] = status
+        day.updateState()
     }
 
     fun getMonthStatusesCounts(date: LocalDate): List<Int> {

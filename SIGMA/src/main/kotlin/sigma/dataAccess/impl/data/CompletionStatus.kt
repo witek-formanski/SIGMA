@@ -1,10 +1,10 @@
 package sigma.dataAccess.impl.data
 
 enum class CompletionStatus(private val code: String) {
-    UNKNOWN("0"),
+    UNCOMPLETED("0"),
     COMPLETED("1"),
     PARTIAL("2"),
-    UNCOMPLETED("3");
+    UNKNOWN("3");
 
     override fun toString(): String {
         return code
